@@ -18,13 +18,17 @@ import org.apache.log4j.Logger;
 
 public class BPConsultant extends Player {
 
-	// A buffer to give you some extra time to go back to boat
-	private static final int BOAT_TIME_BUFFER = 5;
+	// A buffer to give you some extra time to go back to boat.
+	// Base value tweaked for d=10.
+	private static final int BOAT_TIME_BUFFER = 10;
 	
 	private static final Logger logger = Logger.getLogger(BPConsultant.class);
 	
 	private Direction direction;
 	Point2D whereIAm = null;
+	// having this flag prevents him from wavering between going and not going to boat
+	private boolean shouldReturnToBoat = false;
+	int boatTimeBufferAdjusted;
 	
 	Set<SeaLifePrototype> seaLifePossibilities;
 	int d = -1;  // parameter "d" == half the board length
@@ -56,10 +60,13 @@ public class BPConsultant extends Player {
 	public Direction getMove() {
 		
 		// Head back to boat if we are running low on time (shortest time back, plus a buffer)
-		if (getRemainingTime() <= NavigateToBoat.getTimeToBoat(whereIAm) + BOAT_TIME_BUFFER) {
-			logger.debug("time remaining: " + getRemainingTime() + " heading back to boat");
-			return NavigateToBoat.getShortestDirectionToBoat(whereIAm);
+		if (getRemainingTime() <= NavigateToBoat.getTimeToBoat(whereIAm) + boatTimeBufferAdjusted || shouldReturnToBoat) {
+			shouldReturnToBoat = true;
+			direction = NavigateToBoat.getShortestDirectionToBoat(whereIAm);
+			logger.debug("(boat) remaining: " + getRemainingTime() + " whereIAm:"+whereIAm + " (dir "+direction+")");
+			return direction;
 		} else {
+//			logger.debug("(normal) remaining: " + getRemainingTime() + " whereIAm:"+whereIAm + " (dir "+d+")");
 			Direction d = getNewDirection();
 			
 			Point2D p = new Point2D.Double(whereIAm.getX() + d.dx,
@@ -83,6 +90,9 @@ public class BPConsultant extends Player {
 		this.r = r;
 		this.n = n;
 		this.round = 0;
+//		this.boatTimeBufferAdjusted = BOAT_TIME_BUFFER * d * 2 / 10;  // d=40 still 1 straggler
+//		this.boatTimeBufferAdjusted = BOAT_TIME_BUFFER * d / 4;  // d=20 still 1 straggler
+		this.boatTimeBufferAdjusted = BOAT_TIME_BUFFER * d / 3;
 	}
 
 

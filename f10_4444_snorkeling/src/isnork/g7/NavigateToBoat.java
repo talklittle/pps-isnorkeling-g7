@@ -33,21 +33,21 @@ public class NavigateToBoat {
 	
 	public static Direction getShortestDirectionToBoat(Point2D from) {
 		if (from.getX() > 0 && from.getY() > 0) {
-			return Direction.SW;
-		} else if (from.getX() > 0 && from.getY() < 0) {
 			return Direction.NW;
+		} else if (from.getX() > 0 && from.getY() < 0) {
+			return Direction.SW;
 		} else if (from.getX() < 0 && from.getY() < 0) {
-			return Direction.NE;
-		} else if (from.getX() < 0 && from.getY() > 0) {
 			return Direction.SE;
+		} else if (from.getX() < 0 && from.getY() > 0) {
+			return Direction.NE;
 		} else if (from.getX() > 0) {
 			return Direction.W;
 		} else if (from.getX() < 0) {
 			return Direction.E;
 		} else if (from.getY() > 0) {
-			return Direction.S;
-		} else if (from.getY() < 0) {
 			return Direction.N;
+		} else if (from.getY() < 0) {
+			return Direction.S;
 		} else {
 			return null;
 		}
