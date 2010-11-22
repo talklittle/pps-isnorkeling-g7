@@ -19,8 +19,7 @@ import org.apache.log4j.Logger;
 public class BPConsultant extends Player {
 
 	// A buffer to give you some extra time to go back to boat.
-	// Base value tweaked for d=10.
-	private static final int BOAT_TIME_BUFFER = 10;
+	private static final int BOAT_TIME_BUFFER = 5;
 	
 	private static final Logger logger = Logger.getLogger(BPConsultant.class);
 	
@@ -90,9 +89,8 @@ public class BPConsultant extends Player {
 		this.r = r;
 		this.n = n;
 		this.round = 0;
-//		this.boatTimeBufferAdjusted = BOAT_TIME_BUFFER * d * 2 / 10;  // d=40 still 1 straggler
-//		this.boatTimeBufferAdjusted = BOAT_TIME_BUFFER * d / 4;  // d=20 still 1 straggler
-		this.boatTimeBufferAdjusted = BOAT_TIME_BUFFER * d / 3;
+		// TODO adjust boat time buffer based on the number of dangerous creatures
+		this.boatTimeBufferAdjusted = BOAT_TIME_BUFFER;
 	}
 
 
