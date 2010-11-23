@@ -73,7 +73,7 @@ public final class BoardPanel extends JPanel implements MouseMotionListener {
 	final Color default_color = new Color(0, 65, 18);
 	final Color default_danger_color = new Color(255, 0, 0);
 	final Color ocrean_color = new Color(205, 221, 229);
-
+	final Color visible_color = new Color(205,0,229);
 	public void paint(Graphics g) {
 		if (board == null)
 			return;
@@ -100,6 +100,16 @@ public final class BoardPanel extends JPanel implements MouseMotionListener {
 				(int) Board.toScreenSpace(0),
 				(int) Board.toScreenSpaceNoOffset(1),
 				(int) Board.toScreenSpaceNoOffset(1));
+		
+		if(onPlayer)
+		{
+			g2D.setColor(visible_color);
+			double tx = Board.toScreenSpace(MouseCoords.getX() - engine.getConfig().getR());
+			double ty = Board.toScreenSpace(MouseCoords.getY()- engine.getConfig().getR() );
+			Ellipse2D visibleBox = new Ellipse2D.Double(tx,ty, Board.toScreenSpaceNoOffset(engine.getConfig().getR()*2 + 1) , Board.toScreenSpaceNoOffset(engine.getConfig().getR()*2 + 1) );
+			g2D.fill(visibleBox);
+		}
+		g2D.setColor(Color.black);
 		drawGrid(g2D);
 
 		if (engine != null && engine.getConfig() != null
@@ -203,7 +213,8 @@ public final class BoardPanel extends JPanel implements MouseMotionListener {
 			r = 0 - r - 1;
 		return r;
 	}
-
+	boolean onPlayer = false;
+	Point mouseLoc = null;
 	public void mouseMoved(MouseEvent e) {
 		MouseCoords = Board.fromScreenSpace(e.getPoint());
 		MouseCoords = new Point2D.Double(floorAbs(MouseCoords.getX()),
@@ -226,10 +237,12 @@ public final class BoardPanel extends JPanel implements MouseMotionListener {
 				tip+="<i>No sealife here</i><br>";
 			n =0;
 			tip +="<b>Players here:</b><br>";
+			onPlayer = false;
 			for(Player p : engine.players)
 			{
 				if(p.location.equals(MouseCoords))
 				{
+					onPlayer = true;
 					tip+=p.toString()+"<br>";
 					n++;
 				}

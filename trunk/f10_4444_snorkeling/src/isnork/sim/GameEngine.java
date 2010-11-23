@@ -27,7 +27,6 @@ import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 public final class GameEngine {
 	private GameConfig config;
@@ -37,9 +36,6 @@ public final class GameEngine {
 	private ArrayList<GameListener> gameListeners;
 	private Logger log;
 
-	static {
-		PropertyConfigurator.configure("logger.properties");
-	}
 	public GameEngine() {
 		config = new GameConfig();
 		gameListeners = new ArrayList<GameListener>();
@@ -173,6 +169,8 @@ public final class GameEngine {
 						happy = s.happiness/4;
 						beenSeenByName.get(pl).put(s.getName(), 3);
 					}
+					if(pl.location.getX() == 0 && pl.location.getY() == 0 && s.dangerous)
+						happy = 0;
 					
 					beenSeenById.get(pl).add(s);
 					
@@ -183,6 +181,7 @@ public final class GameEngine {
 					o.happy=happy;
 					o.danger=s.dangerous;
 					observations.add(o);
+
 					pl.happiness += happy;
 					score += happy;
 				}
