@@ -1,23 +1,17 @@
 package isnork.g7;
 
-import isnork.sim.GameController;
 import isnork.sim.Observation;
 import isnork.sim.GameObject.Direction;
 
 import java.awt.geom.Point2D;
 import java.util.HashMap;
-import java.util.Random;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 public class DangerFinder {
 	
 	private HashMap<Direction, Double> directionDanger;
 	private static final double DANGER_MULTIPLIER = 2;
-	private static final int NUM_DIRECTIONS = 8;
-	private Logger log;
 	private Point2D myPosition;
 	private Set<Observation> whatYouSee;
 	private OurBoard ourBoard;
@@ -36,7 +30,6 @@ public class DangerFinder {
 			directionDanger.put(d, new Double(0));
 		}
 		
-		log = Logger.getLogger(DangerFinder.class);
 	}
 	
 	
@@ -50,7 +43,7 @@ public class DangerFinder {
 			Direction directionToCreature = ourBoard.getDirectionTowards(myPosition, o.getLocation());
 			
 			if (directionDanger.get(directionToCreature) != null && o.isDangerous()){
-				double formerDirectionDanger = directionDanger.get(directionToCreature);
+//				double formerDirectionDanger = directionDanger.get(directionToCreature);
 //				System.out.println("formerDirectionDanger" + formerDirectionDanger);
 				
 //				directionDanger.put(directionToCreature, new Double(Math.abs(formerDirectionDanger) + o.happiness()*DANGER_MULTIPLIER));
