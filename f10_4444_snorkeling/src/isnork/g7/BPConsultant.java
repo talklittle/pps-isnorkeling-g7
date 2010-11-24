@@ -10,7 +10,9 @@ import isnork.sim.GameObject.Direction;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Set;
+
 
 import org.apache.log4j.Logger;
 
@@ -36,6 +38,16 @@ public class BPConsultant extends Player {
 	int penalty;
 	int round = 0;
 	
+	private OurBoard ourBoard;
+	private DangerFinder dangerFinder;
+	private Point2D myPosition = null;
+	private Set<Observation> whatYouSee = null;
+	
+	public BPConsultant(){
+		ourBoard = new OurBoard();
+		dangerFinder = new DangerFinder(ourBoard);
+	}
+	
 	@Override
 	public String getName() {
 		return "BP Consultant";
@@ -44,6 +56,9 @@ public class BPConsultant extends Player {
 	@Override
 	public String tick(Point2D myPosition, Set<Observation> whatYouSee,
 			Set<iSnorkMessage> incomingMessages,Set<Observation> playerLocations) {
+		this.myPosition = myPosition;
+		this.whatYouSee = whatYouSee;
+		
 		String snorkMessage = null;
 		whereIAm = myPosition;
 		if(n % 10 == 0)
@@ -55,9 +70,10 @@ public class BPConsultant extends Player {
 		return snorkMessage;
 	}
 	
-	@Override
-	public Direction getMove() {
+
 		
+	@Override
+	public Direction getMove() {	
 		// Head back to boat if we are running low on time (shortest time back, plus a buffer)
 		if (getRemainingTime() <= NavigateToBoat.getTimeToBoat(whereIAm) + boatTimeBufferAdjusted || shouldReturnToBoat) {
 			shouldReturnToBoat = true;
@@ -66,7 +82,18 @@ public class BPConsultant extends Player {
 			return direction;
 		} else {
 //			logger.debug("(normal) remaining: " + getRemainingTime() + " whereIAm:"+whereIAm + " (dir "+d+")");
-			Direction d = getNewDirection();
+			//Direction d = getNewDirection();
+			
+			logger.trace("in getMove()");
+			
+			Direction d = dangerFinder.findSafestDirection(myPosition, whatYouSee);
+			//dangerFinder.printSurroundingDanger();
+			
+			if (d == null){
+				d = getNewDirection();
+			}
+			
+			
 			
 			Point2D p = new Point2D.Double(whereIAm.getX() + d.dx,
 					whereIAm.getY() + d.dy);
@@ -91,6 +118,7 @@ public class BPConsultant extends Player {
 		this.round = 0;
 		// TODO adjust boat time buffer based on the number of dangerous creatures
 		this.boatTimeBufferAdjusted = BOAT_TIME_BUFFER;
+		this.ourBoard = new OurBoard();
 	}
 
 
