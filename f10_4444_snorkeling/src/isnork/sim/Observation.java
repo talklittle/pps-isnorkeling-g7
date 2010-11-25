@@ -1,11 +1,15 @@
 package isnork.sim;
 
+import isnork.sim.GameObject.Direction;
+
 import java.awt.geom.Point2D;
 
 public class Observation {
 	Point2D location;
 	int id;
 	String name;
+	Direction dir;
+	
 	public Point2D getLocation(){
 		return location;
 	}
@@ -16,6 +20,10 @@ public class Observation {
 	public String getName()
 	{
 		return name;
+	}
+	public Direction getDirection()
+	{
+		return dir;
 	}
 	public boolean isDangerous()
 	{
