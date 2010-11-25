@@ -20,6 +20,11 @@ public abstract class Player {
 	{
 		return id;
 	}
+	public int getHappiness()
+    {
+        return happiness;
+    }
+
     /**
      * Returns the name for this player
      */
