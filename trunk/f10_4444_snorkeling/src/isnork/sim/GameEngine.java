@@ -27,6 +27,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 public final class GameEngine {
 	private GameConfig config;
@@ -36,6 +37,10 @@ public final class GameEngine {
 	private ArrayList<GameListener> gameListeners;
 	private Logger log;
 
+	static {
+		PropertyConfigurator.configure("logger.properties");
+	}
+	
 	public GameEngine() {
 		config = new GameConfig();
 		gameListeners = new ArrayList<GameListener>();
