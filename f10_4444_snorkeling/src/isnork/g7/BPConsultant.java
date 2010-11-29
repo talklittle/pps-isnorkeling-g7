@@ -86,7 +86,7 @@ public class BPConsultant extends Player {
 			logger.trace("in getMove()");
 			
 			Direction d = dangerFinder.findSafestDirection(myPosition, whatYouSee);
-			//dangerFinder.printSurroundingDanger();
+			dangerFinder.printSurroundingDanger();
 			
 			if (d == null){
 				d = getNewDirection();

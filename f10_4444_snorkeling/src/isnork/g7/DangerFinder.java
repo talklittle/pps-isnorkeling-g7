@@ -7,6 +7,8 @@ import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 
 public class DangerFinder {
 	
@@ -17,6 +19,8 @@ public class DangerFinder {
 	private OurBoard ourBoard;
 	private Direction mySafestDirection;
 	
+	Logger logger = Logger.getLogger(DangerFinder.class);
+	
 
 	public DangerFinder(OurBoard ourBoard){
 		this.ourBoard = ourBoard;
@@ -24,9 +28,9 @@ public class DangerFinder {
 		
 		/*Initialize dangerList*/
 		
-//		System.out.println("initializing direction list: " + Direction.values());
+		logger.debug("initializing direction list: " + Direction.values());
 		for (Direction d: Direction.values()){
-//			System.out.println("d: " + d);
+			logger.debug("d: " + d);
 			directionDanger.put(d, new Double(0));
 		}
 		
@@ -37,17 +41,17 @@ public class DangerFinder {
 	private void findDanger(){
 			
 		for(Observation o : whatYouSee){
-//			System.out.println("What I see: " +  o.getName());	
-//			System.out.println("Is it dangerous? " + o.isDangerous());
+			logger.debug("What I see: " +  o.getName());	
+			logger.debug("Is it dangerous? " + o.isDangerous());
 			
 			Direction directionToCreature = ourBoard.getDirectionTowards(myPosition, o.getLocation());
 			
 			if (directionDanger.get(directionToCreature) != null && o.isDangerous()){
-//				double formerDirectionDanger = directionDanger.get(directionToCreature);
-//				System.out.println("formerDirectionDanger" + formerDirectionDanger);
+				double formerDirectionDanger = directionDanger.get(directionToCreature);
+				logger.debug("formerDirectionDanger" + formerDirectionDanger);
 				
-//				directionDanger.put(directionToCreature, new Double(Math.abs(formerDirectionDanger) + o.happiness()*DANGER_MULTIPLIER));
-//				System.out.println("o.happiness" + o.happiness());
+				directionDanger.put(directionToCreature, new Double(Math.abs(formerDirectionDanger) + o.happiness()*DANGER_MULTIPLIER));
+				logger.debug("o.happiness" + o.happiness());
 
 			}
 			else if (o.isDangerous()){
@@ -61,20 +65,20 @@ public class DangerFinder {
 		this.whatYouSee = whatYouSee;
 		
 		for (Direction d: Direction.values()){
-//			System.out.println("d: " + d);
+			logger.debug("d: " + d);
 			directionDanger.put(d, new Double(0));
 		}
 	}
 	
 	public void printSurroundingDanger(){
-		System.out.println("Here's the danger surrounding the diver at " + myPosition + ":\n");
+		logger.debug("Here's the danger surrounding the diver at " + myPosition + ":");
 		
 		for (Direction d : directionDanger.keySet()){
 			if (d!= null)
-				System.out.println(d.toString() + ": " + directionDanger.get(d) + "\n");
+				logger.debug(d.toString() + ": " + directionDanger.get(d));
 		}
 		
-		System.out.println("I want to head in direction " + mySafestDirection + ":\n");
+		logger.debug("I want to head in direction " + mySafestDirection + ":");
 
 	}
 	
@@ -82,7 +86,7 @@ public class DangerFinder {
 		updateCoordinates(myPosition, whatYouSee);
 		findDanger();
 		
-//		System.out.println("in find safest direction");
+		logger.debug("in find safest direction");
 		double maxDanger = 0;
 		
 		Direction safestDirection = null;
@@ -90,11 +94,11 @@ public class DangerFinder {
 		for (Direction d : directionDanger.keySet()){
 			double curDanger = Math.abs(directionDanger.get(d));
 			
-//			System.out.println("current danger in direction " + d + ":" + curDanger);
+			logger.debug("current danger in direction " + d + ":" + curDanger);
 			
 			if (curDanger > maxDanger){
 				safestDirection = ourBoard.getOppositeDirection(d);
-//				System.out.println("Max Danger so far in Direction: " + d);
+				logger.debug("Max Danger so far in Direction: " + d);
 
 				maxDanger = curDanger;
 			}
