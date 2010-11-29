@@ -11,20 +11,13 @@ import isnork.sim.GameObject.Direction;
 import isnork.sim.ui.GUI;
 import isnork.sim.ui.Text;
 
-import java.awt.Point;
-import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Random;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -40,7 +33,7 @@ public final class GameEngine {
 	static {
 		PropertyConfigurator.configure("logger.properties");
 	}
-	
+
 	public GameEngine() {
 		config = new GameConfig();
 		gameListeners = new ArrayList<GameListener>();
@@ -72,15 +65,21 @@ public final class GameEngine {
 	HashMap<Player, QueuedPlayer> queuedPlayers;
 	HashMap<Player,HashSet<SeaLife>> beenSeenById;
 	HashMap<Player,HashMap<String, Integer>> beenSeenByName;
+	int dsq = 0;
+	public int getDsq() {
+		return dsq;
+	}
 	public boolean step() {
 		if(round > 480)
 		{
 			Point2D origin = new Point2D.Double(0, 0);
+			dsq = 0;
 			for (Player pl : players) {
 				if(!pl.location.equals(origin))
 				{
 					pl.happiness-=config.getPenalty();
 					score-=config.getPenalty();
+					dsq++;
 				}
 			}
 			notifyListeners(GameUpdateType.GAMEOVER);
