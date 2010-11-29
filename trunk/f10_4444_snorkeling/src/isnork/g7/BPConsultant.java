@@ -42,11 +42,6 @@ public class BPConsultant extends Player {
 	private Point2D myPosition = null;
 	private Set<Observation> whatYouSee = null;
 	
-	public BPConsultant(){
-		ourBoard = new OurBoard();
-		dangerFinder = new DangerFinder(ourBoard);
-	}
-	
 	@Override
 	public String getName() {
 		return "BP Consultant";
@@ -85,8 +80,8 @@ public class BPConsultant extends Player {
 			
 			logger.trace("in getMove()");
 			
-			Direction d = dangerFinder.findSafestDirection(myPosition, whatYouSee);
-			dangerFinder.printSurroundingDanger();
+			Direction d = dangerFinder.findSafestDirection(myPosition, whatYouSee, direction);
+//			dangerFinder.printSurroundingDanger();
 			
 			if (d == null){
 				d = getNewDirection();
@@ -118,6 +113,7 @@ public class BPConsultant extends Player {
 		// TODO adjust boat time buffer based on the number of dangerous creatures
 		this.boatTimeBufferAdjusted = BOAT_TIME_BUFFER;
 		this.ourBoard = new OurBoard();
+		this.dangerFinder = new DangerFinder(ourBoard, random);
 	}
 
 
