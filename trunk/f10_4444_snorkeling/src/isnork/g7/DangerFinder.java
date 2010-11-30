@@ -63,16 +63,21 @@ public class DangerFinder {
 			
 			// Get the location and distance based on predicted location
 			// (taking into account whether creature is stationary or moving).
-			if (speed == 0) {
+			if (speed == 0 || o.getDirection() == null) {
 				predictedLocations.add(o.getLocation());
 			} else {
 				// predict where it will be
-				predictedLocations.add(new Point2D.Double(
+				Point2D loc = new Point2D.Double(
 //						o.getLocation().getX() + (o.getDirection().getDx() * (o.getDirection().isDiag() ? 3 : 2)),
 //						o.getLocation().getY() + (o.getDirection().getDy() * (o.getDirection().isDiag() ? 3 : 2))
 						o.getLocation().getX() + (o.getDirection().getDx()),
 						o.getLocation().getY() + (o.getDirection().getDy())
-						));
+						);
+				if (ourBoard.inBounds((int)loc.getX(), (int)loc.getY())) {
+					predictedLocations.add(loc);
+				} else {
+					predictedLocations.add(o.getLocation());
+				}
 			}
 			
 			// Consider the Directions surrounding the creature
