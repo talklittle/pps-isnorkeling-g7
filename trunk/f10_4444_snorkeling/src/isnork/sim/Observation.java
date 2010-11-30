@@ -5,7 +5,7 @@ import isnork.sim.GameObject.Direction;
 import java.awt.geom.Point2D;
 
 public class Observation {
-	Point2D location;
+	protected Point2D location;
 	int id;
 	String name;
 	Direction dir;
@@ -33,6 +33,7 @@ public class Observation {
 	{
 		return happy;
 	}
+
 	int happy;
 	boolean danger;
 }
