@@ -1,7 +1,9 @@
 package isnork.g7;
 
+import isnork.sim.Observation;
 import isnork.sim.SeaLifePrototype;
 
+import java.awt.geom.Point2D;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -17,7 +19,7 @@ public class TaskManager {
 	private OurBoard ourBoard;
 	private Set<SeaLifePrototype> seaLifePossibilities;
 	
-	public TaskManager(Set<SeaLifePrototype> seaLifePossibilities, OurBoard ourBoard){
+	public TaskManager(Set<SeaLifePrototype> seaLifePossibilities, OurBoard ourBoard, Set<Observation> playerLocations){
 		taskList = new PriorityQueue<Task>(10, new TaskComparator());
 		seenObjects = new HashMap<Task, Boolean>();
 		this.seaLifePossibilities = seaLifePossibilities;
@@ -34,8 +36,8 @@ public class TaskManager {
         }
     }
 	
-	public void addTask(String creatureName, int playerID){
-		Task task = new Task(creatureName, playerID, ourBoard);
+	public void addTask(String creatureName, int playerID, Set<Observation> playerLocations){
+		Task task = new Task(creatureName, playerID, ourBoard, seaLifePossibilities, playerLocations);
 		taskList.add(task);
 		seenObjects.put(task, false);
 		
@@ -44,8 +46,9 @@ public class TaskManager {
 		seenCreatures.put(creatureName, new Integer(numPreviousSightings++));
 	}
 	
-	public void addTask(String creatureName, Coordinate coordinate){
-		Task task = new Task(creatureName, coordinate, ourBoard);
+	public void addTask(String creatureName, Point2D coordinate, Set<Observation> playerLocations){
+		Task task = new Task(creatureName, ourBoard, seaLifePossibilities, playerLocations);
+		task.getObservation().setLocation(coordinate);
 		taskList.add(task);
 		seenObjects.put(task, false);
 		
@@ -56,7 +59,7 @@ public class TaskManager {
 	
 	
 	/*Will return null if there are no valid remaining tasks in the queue*/
-	public Task getNextTask(Location myCurrentLocation){
+	public Task getNextTask(Point2D myCurrentLocation){
 		updatePriorityScores(myCurrentLocation);
 		Task nextTask = taskList.remove();
 		
@@ -92,22 +95,8 @@ public class TaskManager {
 		seenCreatures.put(creatureName, new Integer(numCreatureSightings++));
 	}
 	
-	private SeaLifePrototype getCreature(String creatureName){
-		Iterator<SeaLifePrototype> seaLifeIt = seaLifePossibilities.iterator();
-		
-		SeaLifePrototype nextCreature = seaLifeIt.next();
-		
-		while(nextCreature!=null){
-			if (nextCreature.getName() == creatureName) {
-				return nextCreature;
-			}
-		}
-		
-		return nextCreature;
-	}
-	
 	/*TODO Change all usage of Location to Point2D locations*/
-	private void updatePriorityScores(Location myCurrentLocation){
+	private void updatePriorityScores(Point2D myCurrentLocation){
 		Iterator<Task> taskIterator = taskList.iterator();
 		
 		Task nextTask = taskIterator.next();
