@@ -63,8 +63,19 @@ public class OurBoard {
 			return null;
 	}
 	
+	public double findDistanceToObservation(OurObservation observation, Location myCurrentLocation){
+		
+		Location obsLocation = observation.getLocation();
+		double dx = Math.abs(obsLocation.getCoordinate().getX() - myCurrentLocation.getCoordinate().getX());
+		double dy = Math.abs(obsLocation.getCoordinate().getY() - myCurrentLocation.getCoordinate().getY());
+
+		double dz = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+		
+		return dz;
+		
+	}
+	
 	public boolean inBounds(int x, int y) {
 		return Math.abs(x) <= d && Math.abs(y) <= d;
 	}
-
 }
