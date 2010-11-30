@@ -5,6 +5,11 @@ import isnork.sim.GameObject.Direction;
 
 public class OurBoard {
 	
+	int d;
+	
+	public OurBoard(int d) {
+		this.d = d;
+	}
 	
 	/*Returns the direction between to points*/
 	public static Direction getDirectionTowards(Point2D from, Point2D to){
@@ -56,6 +61,10 @@ public class OurBoard {
 			return Direction.S;
 		else 
 			return null;
+	}
+	
+	public boolean inBounds(int x, int y) {
+		return Math.abs(x) <= d && Math.abs(y) <= d;
 	}
 
 }
