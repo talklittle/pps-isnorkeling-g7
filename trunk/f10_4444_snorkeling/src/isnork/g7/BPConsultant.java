@@ -116,7 +116,7 @@ public class BPConsultant extends Player {
 		this.ourBoard = new OurBoard(d);
 		this.dangerFinder = new DangerFinder(ourBoard, seaLifePossibilities, random);
 		
-		taskManager = new TaskManager(seaLifePossibilities, ourBoard);
+		taskManager = new TaskManager(seaLifePossibilities, ourBoard, null);
 	}
 
 

@@ -1,6 +1,11 @@
 package isnork.g7;
 
+import isnork.sim.Observation;
+import isnork.sim.SeaLifePrototype;
+
+import java.awt.geom.Point2D;
 import java.util.Comparator;
+import java.util.Set;
 
 public class Task {
 	
@@ -8,18 +13,18 @@ public class Task {
 	private double priorityScore = 0; 
 	private OurBoard ourBoard;
 	
-	public Task(String creatureName, int playerID, OurBoard ourBoard){
-		this.observation = new OurObservation(creatureName, new Location(playerID));
+	public Task(String creatureName, int playerID, OurBoard ourBoard, Set<SeaLifePrototype> seaLifePossibilities, Set<Observation> playerLocations){
+		observation = new OurObservation(creatureName, seaLifePossibilities, playerLocations);
 		this.ourBoard = ourBoard; 
 	}
 	
-	public Task(String creatureName, Coordinate coordinate, OurBoard ourBoard){
-		this.observation = new OurObservation(creatureName, new Location(coordinate));
+	public Task(String creatureName, OurBoard ourBoard, Set<SeaLifePrototype> seaLifePossibilities, Set<Observation> playerLocations){
+		this.observation = new OurObservation(creatureName, seaLifePossibilities, playerLocations);
 		this.ourBoard = ourBoard; 
 	}
 	
-	public void updatePriorityScore(Location myCurrentLocation){
-		priorityScore = observation.getHappiness() / ourBoard.findDistanceToObservation(observation, myCurrentLocation);
+	public void updatePriorityScore(Point2D myCurrentLocation){
+		priorityScore = observation.happiness() / ourBoard.findDistanceToObservation(observation, myCurrentLocation);
 	}
 
 	public double getPriorityScore(){
