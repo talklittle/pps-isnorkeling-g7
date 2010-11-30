@@ -7,7 +7,7 @@ public class OurBoard {
 	
 	
 	/*Returns the direction between to points*/
-	public Direction getDirectionTowards(Point2D from, Point2D to){
+	public static Direction getDirectionTowards(Point2D from, Point2D to){
 		
 		if (from.getX() < to.getX() && from.getY() > to.getY()){
 			return Direction.NE;
