@@ -4,7 +4,6 @@ import isnork.sim.Observation;
 import isnork.sim.SeaLifePrototype;
 
 import java.awt.geom.Point2D;
-import java.util.Comparator;
 import java.util.Set;
 
 public class Task {

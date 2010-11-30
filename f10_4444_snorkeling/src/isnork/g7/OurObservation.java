@@ -40,20 +40,6 @@ public class OurObservation extends Observation {
 	public String getCreatureName(){
 		return creatureName;
 	}
-
-	private SeaLifePrototype getCreature(String creatureName){
-		Iterator<SeaLifePrototype> seaLifeIt = seaLifePossibilities.iterator();
-		
-		SeaLifePrototype nextCreature = seaLifeIt.next();
-		
-		while(nextCreature!=null){
-			if (nextCreature.getName() == creatureName) {
-				return nextCreature;
-			}
-		}
-		
-		return nextCreature;
-	}
 	
 	public Point2D getLocation(){
 		if (playerID != -1){

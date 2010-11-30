@@ -53,6 +53,7 @@ public class BPConsultant extends Player {
 			Set<iSnorkMessage> incomingMessages,Set<Observation> playerLocations) {
 		this.myPosition = myPosition;
 		this.whatYouSee = whatYouSee;
+		taskManager.setPlayerLocations(playerLocations);
 		
 		String snorkMessage = null;
 		whereIAm = myPosition;
@@ -116,7 +117,7 @@ public class BPConsultant extends Player {
 		this.ourBoard = new OurBoard(d);
 		this.dangerFinder = new DangerFinder(ourBoard, seaLifePossibilities, random);
 		
-		taskManager = new TaskManager(seaLifePossibilities, ourBoard, null);
+		taskManager = new TaskManager(seaLifePossibilities, ourBoard);
 	}
 
 
