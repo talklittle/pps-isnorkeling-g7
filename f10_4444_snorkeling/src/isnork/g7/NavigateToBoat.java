@@ -1,8 +1,10 @@
 package isnork.g7;
 
 import isnork.sim.GameObject.Direction;
+import isnork.sim.SeaLifePrototype;
 
 import java.awt.geom.Point2D;
+import java.util.Set;
 
 public class NavigateToBoat {
 	/**
@@ -51,5 +53,16 @@ public class NavigateToBoat {
 		} else {
 			return null;
 		}
+	}
+	
+	public static int getBoatTimeBufferAdjusted(int baseTime, Set<SeaLifePrototype> seaLifePossibilities, int d) {
+		int numDangerousCreatures = 0;
+		for (SeaLifePrototype life : seaLifePossibilities) {
+			if (life.isDangerous()) {
+				numDangerousCreatures += life.getMaxCount();
+			}
+		}
+		// it takes 14 minutes to go around a 3x3 square
+		return baseTime + (14 * numDangerousCreatures / 4 / (d * d));
 	}
 }

@@ -20,7 +20,8 @@ import org.apache.log4j.Logger;
 public class BPConsultant extends Player {
 
 	// A buffer to give you some extra time to go back to boat.
-	private static final int BOAT_TIME_BUFFER = 5;
+	// Why 6: allows you to make 1 useless diagonal move away from boat. 3 minutes each way.
+	private static final int BOAT_TIME_BUFFER = 6;
 	
 	private static final Logger logger = Logger.getLogger(BPConsultant.class);
 	
@@ -73,7 +74,16 @@ public class BPConsultant extends Player {
 		// Head back to boat if we are running low on time (shortest time back, plus a buffer)
 		if (getRemainingTime() <= NavigateToBoat.getTimeToBoat(whereIAm) + boatTimeBufferAdjusted || shouldReturnToBoat) {
 			shouldReturnToBoat = true;
-			direction = NavigateToBoat.getShortestDirectionToBoat(whereIAm);
+			// If not enough time, ignore all dangerous creatures and return to boat.
+			if (getRemainingTime() < NavigateToBoat.getTimeToBoat(whereIAm) + 6) {
+				direction = NavigateToBoat.getShortestDirectionToBoat(whereIAm);
+			}
+			// If there are at least 6 spare minutes, that lets you maneuver around dangerous creatures,
+			// even going diagonally away from boat once.
+			else {
+				Direction preferredDirectionToBoat = NavigateToBoat.getShortestDirectionToBoat(whereIAm);
+				direction = dangerFinder.findSafestDirection(myPosition, whatYouSee, preferredDirectionToBoat, true);
+			}
 			logger.debug("(boat) remaining: " + getRemainingTime() + " whereIAm:"+whereIAm + " (dir "+direction+")");
 			return direction;
 		} else {
@@ -82,7 +92,7 @@ public class BPConsultant extends Player {
 			
 			logger.trace("in getMove()");
 			
-			Direction d = dangerFinder.findSafestDirection(myPosition, whatYouSee, direction);
+			Direction d = dangerFinder.findSafestDirection(myPosition, whatYouSee, direction, false);
 //			dangerFinder.printSurroundingDanger();
 			
 			if (d == null){
@@ -112,8 +122,7 @@ public class BPConsultant extends Player {
 		this.r = r;
 		this.n = n;
 		this.round = 0;
-		// TODO adjust boat time buffer based on the number of dangerous creatures
-		this.boatTimeBufferAdjusted = BOAT_TIME_BUFFER;
+		this.boatTimeBufferAdjusted = NavigateToBoat.getBoatTimeBufferAdjusted(BOAT_TIME_BUFFER, seaLifePossibilities, d);
 		this.ourBoard = new OurBoard(d);
 		this.dangerFinder = new DangerFinder(ourBoard, seaLifePossibilities, random);
 		
