@@ -34,20 +34,30 @@ public class TaskManager {
         }
     }
 	
-	//TO-DO: Finish this implementation
 	public void addTask(String creatureName, int playerID){
 		Task task = new Task(creatureName, playerID, ourBoard);
 		taskList.add(task);
 		seenObjects.put(task, false);
 		
 		int numPreviousSightings = seenCreatures.get(creatureName).intValue();
+		task.discountPriorityScore((1.0/(1+numPreviousSightings)));
 		seenCreatures.put(creatureName, new Integer(numPreviousSightings++));
-
+	}
+	
+	public void addTask(String creatureName, Coordinate coordinate){
+		Task task = new Task(creatureName, coordinate, ourBoard);
+		taskList.add(task);
+		seenObjects.put(task, false);
+		
+		int numPreviousSightings = seenCreatures.get(creatureName).intValue();
+		task.discountPriorityScore((1.0/(1+numPreviousSightings)));
+		seenCreatures.put(creatureName, new Integer(numPreviousSightings++));
 	}
 	
 	
 	/*Will return null if there are no valid remaining tasks in the queue*/
-	public Task getNextTask(){
+	public Task getNextTask(Location myCurrentLocation){
+		updatePriorityScores(myCurrentLocation);
 		Task nextTask = taskList.remove();
 		
 		while (!nextTask.getObservation().isValid() || !taskUnseen(nextTask)){
@@ -73,7 +83,6 @@ public class TaskManager {
 	}
 	
 	public void markTaskComplete(Task task){
-		seenObjects.put(task, true);
 		task.getObservation().setInvalid();
 		markCreatureSeen(task.getObservation().getCreatureName());
 	}
@@ -95,5 +104,16 @@ public class TaskManager {
 		}
 		
 		return nextCreature;
+	}
+	
+	/*TODO Change all usage of Location to Point2D locations*/
+	private void updatePriorityScores(Location myCurrentLocation){
+		Iterator<Task> taskIterator = taskList.iterator();
+		
+		Task nextTask = taskIterator.next();
+		
+		while (nextTask != null){
+			nextTask.updatePriorityScore(myCurrentLocation);
+		}
 	}
 }

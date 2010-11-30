@@ -18,16 +18,16 @@ public class Task {
 		this.ourBoard = ourBoard; 
 	}
 	
+	public void updatePriorityScore(Location myCurrentLocation){
+		priorityScore = observation.getHappiness() / ourBoard.findDistanceToObservation(observation, myCurrentLocation);
+	}
+
 	public double getPriorityScore(){
 		return priorityScore;
 	}
 	
 	public OurObservation getObservation(){
 		return observation;
-	}
-	
-	private void findPriorityScore(Location myCurrentLocation){
-		priorityScore = observation.getHappiness() / ourBoard.findDistanceToObservation(observation, myCurrentLocation);
 	}
 	
 	public int compareTo(Task otherTask){
@@ -37,6 +37,10 @@ public class Task {
 			return 1;
 		else
 			return 0;
+	}
+	
+	public void discountPriorityScore(double discount){
+		priorityScore *= (1-discount);
 	}
 	
 }
