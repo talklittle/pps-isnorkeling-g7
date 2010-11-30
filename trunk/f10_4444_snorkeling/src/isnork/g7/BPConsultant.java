@@ -41,6 +41,7 @@ public class BPConsultant extends Player {
 	private DangerFinder dangerFinder;
 	private Point2D myPosition = null;
 	private Set<Observation> whatYouSee = null;
+	private TaskManager taskManager;
 	
 	@Override
 	public String getName() {
@@ -114,6 +115,8 @@ public class BPConsultant extends Player {
 		this.boatTimeBufferAdjusted = BOAT_TIME_BUFFER;
 		this.ourBoard = new OurBoard(d);
 		this.dangerFinder = new DangerFinder(ourBoard, seaLifePossibilities, random);
+		
+		taskManager = new TaskManager(seaLifePossibilities, ourBoard);
 	}
 
 

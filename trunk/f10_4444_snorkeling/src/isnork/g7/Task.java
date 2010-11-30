@@ -8,13 +8,13 @@ public class Task {
 	private double priorityScore = 0; 
 	private OurBoard ourBoard;
 	
-	public Task(int creatureID, int playerID, OurBoard ourBoard){
-		this.observation = new OurObservation(creatureID, new Location(playerID));
+	public Task(String creatureName, int playerID, OurBoard ourBoard){
+		this.observation = new OurObservation(creatureName, new Location(playerID));
 		this.ourBoard = ourBoard; 
 	}
 	
-	public Task(int creatureID, Coordinate coordinate, OurBoard ourBoard){
-		this.observation = new OurObservation(creatureID, new Location(coordinate));
+	public Task(String creatureName, Coordinate coordinate, OurBoard ourBoard){
+		this.observation = new OurObservation(creatureName, new Location(coordinate));
 		this.ourBoard = ourBoard; 
 	}
 	

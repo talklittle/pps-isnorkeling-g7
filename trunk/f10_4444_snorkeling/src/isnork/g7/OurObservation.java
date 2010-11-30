@@ -2,17 +2,14 @@ package isnork.g7;
 
 public class OurObservation {
 	
-	private int creatureID;
 	private Location location;
 	private boolean isValid;
 	private String creatureName;
 	
-	public OurObservation(int creatureID, Location location){
-		this.creatureID = creatureID;
+	public OurObservation(String creatureName, Location location){
+		this.creatureName = creatureName;
 		this.location = location;
 		this.isValid = true;
-		
-		findCreatureName(creatureID);
 	}
 
 	public Location getLocation(){
@@ -26,23 +23,14 @@ public class OurObservation {
 	public void setInvalid(){
 		isValid = false;
 	}
-	
-	public int getCreatureID(){
-		return creatureID;
-	}
-	
+
 	public int getHappiness(){
 		//TO DO: Check syntax
 		//return creatureID.getHappiness();
 		return 0;
 	}
 	
-	private void findCreatureName(int creatureID){
-		
-		
-	}
-	
-	private String getCreatureName(){
+	public String getCreatureName(){
 		return creatureName;
 	}
 
