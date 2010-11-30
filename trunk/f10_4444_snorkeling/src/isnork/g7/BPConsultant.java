@@ -112,8 +112,8 @@ public class BPConsultant extends Player {
 		this.round = 0;
 		// TODO adjust boat time buffer based on the number of dangerous creatures
 		this.boatTimeBufferAdjusted = BOAT_TIME_BUFFER;
-		this.ourBoard = new OurBoard();
-		this.dangerFinder = new DangerFinder(ourBoard, random);
+		this.ourBoard = new OurBoard(d);
+		this.dangerFinder = new DangerFinder(ourBoard, seaLifePossibilities, random);
 	}
 
 
