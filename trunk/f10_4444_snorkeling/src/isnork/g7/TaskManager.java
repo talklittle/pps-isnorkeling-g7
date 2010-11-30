@@ -10,6 +10,8 @@ import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Set;
 
+/*TODO: STILL NEED TO MARK TASKS INVALID AFTER GETTING MESSAGE FROM FOLLOWING PLAYER THAT STOPS FOLLOWING THE CREATURE*/
+
 public class TaskManager {
 	private PriorityQueue<Task> taskList; 
 	private HashMap<Task, Boolean> seenObjects; 
@@ -18,12 +20,17 @@ public class TaskManager {
 	private HashMap<String, Integer> seenCreatures;
 	private OurBoard ourBoard;
 	private Set<SeaLifePrototype> seaLifePossibilities;
+	private Set<Observation> playerLocations;
 	
-	public TaskManager(Set<SeaLifePrototype> seaLifePossibilities, OurBoard ourBoard, Set<Observation> playerLocations){
+	public TaskManager(Set<SeaLifePrototype> seaLifePossibilities, OurBoard ourBoard){
 		taskList = new PriorityQueue<Task>(10, new TaskComparator());
 		seenObjects = new HashMap<Task, Boolean>();
 		this.seaLifePossibilities = seaLifePossibilities;
 		this.ourBoard = ourBoard;
+	}
+	
+	public void setPlayerLocations(Set<Observation> playerLocations){
+		this.playerLocations = playerLocations;
 	}
 
 	
@@ -78,11 +85,10 @@ public class TaskManager {
 		return seenObjects.get(task);
 	}
 	
-	private boolean creatureUnseen(String seaLifeName){
-		if (seenCreatures.get(seaLifeName).intValue()==0){
-			return true;
-		}
-		return false;	
+	
+	/*This isn't getting used yet*/
+	public void markTaskInvalid(Task task){
+		task.getObservation().setInvalid();
 	}
 	
 	public void markTaskComplete(Task task){
@@ -95,7 +101,6 @@ public class TaskManager {
 		seenCreatures.put(creatureName, new Integer(numCreatureSightings++));
 	}
 	
-	/*TODO Change all usage of Location to Point2D locations*/
 	private void updatePriorityScores(Point2D myCurrentLocation){
 		Iterator<Task> taskIterator = taskList.iterator();
 		
