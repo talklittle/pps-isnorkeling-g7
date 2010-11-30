@@ -142,7 +142,8 @@ public class DangerFinder {
 
 	}
 	
-	public Direction findSafestDirection(Point2D myPosition, Set<Observation> whatYouSee, Direction preferredDirection){
+	public Direction findSafestDirection(Point2D myPosition, Set<Observation> whatYouSee, Direction preferredDirection,
+			boolean shouldReturnToBoat){
 		updateCoordinates(myPosition, whatYouSee);
 		findDanger();
 		
@@ -182,12 +183,27 @@ public class DangerFinder {
 			}
 		} 
 		
-		// 80% of the time, continue in preferredDirection if it is among the safest
-		if (preferredDirection != null && safestDirections.contains(preferredDirection) && random.nextDouble() >= 0.80) {
-			mySafestDirection = preferredDirection;
+		if (shouldReturnToBoat) {
+			// If returning to boat, always head in preferredDirection if it is among the safest
+			if (preferredDirection != null && safestDirections.contains(preferredDirection)) {
+				mySafestDirection = preferredDirection;
+			} else {
+				// Prioritize the directions closer to the safest
+				for (Direction d : DirectionUtil.getClosestDirections(preferredDirection)) {
+					if (safestDirections.contains(d)) {
+						mySafestDirection = d;
+						break;
+					}
+				}
+			}
 		} else {
-			Collections.shuffle(safestDirections);
-			mySafestDirection = safestDirections.get(0);
+			// 80% of the time, continue in preferredDirection if it is among the safest
+			if (preferredDirection != null && safestDirections.contains(preferredDirection) && random.nextDouble() >= 0.80) {
+				mySafestDirection = preferredDirection;
+			} else {
+				Collections.shuffle(safestDirections);
+				mySafestDirection = safestDirections.get(0);
+			}
 		}
 		logger.debug("Safest direction: " + mySafestDirection + " (from among " + safestDirections.toString() + ")");
 		return mySafestDirection;
