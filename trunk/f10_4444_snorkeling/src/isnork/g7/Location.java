@@ -2,7 +2,9 @@ package isnork.g7;
 
 
 import java.awt.geom.Point2D;
+import java.util.Iterator;
 import java.util.Set;
+
 
 import isnork.sim.*;
 
@@ -22,12 +24,15 @@ public class Location {
 	}
 	
 	public Point2D getLocation(){
-		if (playerID == -1){
+		if (playerID != -1){
+			System.out.println("Getting location from player " + playerID);
 			//TRAVERSE CURRENT PLAYER LOCATION LIST AND RETURN THAT LOCATION
 			return getPlayerLocation(playerID);
 		}
-		else
+		else{
+			System.out.println("Returning a static coordinate");
 			return coordinate;
+		}
 	}
 	
 	public void setPlayerLocations(Set<Observation> playerLocations){
@@ -37,11 +42,18 @@ public class Location {
 	private Point2D getPlayerLocation(int playerID){
 		System.out.println("playerLocations");
 		System.out.println(playerLocations);
-		for (Observation player : playerLocations){
-			if(player.getId() == playerID  && player!=null){
-				return player.getLocation();
+		
+		if(playerLocations!= null){
+			Iterator<Observation> playerIterator = playerLocations.iterator();
+			
+			while(playerIterator.hasNext()){
+				Observation nextPlayer = playerIterator.next();
+				if(nextPlayer.getId() == playerID  && nextPlayer!=null){
+					return nextPlayer.getLocation();
+				}
 			}
 		}
+		
 		return null;
 	}
 

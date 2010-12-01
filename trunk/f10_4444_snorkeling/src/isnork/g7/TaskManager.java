@@ -78,13 +78,20 @@ public class TaskManager {
 	public Task getNextTask(Point2D myCurrentLocation){
 		updatePriorityScores(myCurrentLocation);
 		
+		Iterator<Task> taskIterator = taskList.iterator();
+		
 		Task nextTask;
 
-		if(!taskList.isEmpty()){
-			nextTask = taskList.remove();
+		if(taskIterator.hasNext()){
+			nextTask = taskIterator.next();
 		
-			while(!taskList.isEmpty()&&!nextTask.getObservation().isValid() || !taskUnseen(nextTask)){
-				nextTask = taskList.remove();
+			while(!nextTask.getObservation().isValid() || !taskUnseen(nextTask)){
+				
+				if(taskIterator.hasNext()){
+					nextTask = taskIterator.next();
+				}
+				else 
+					break;
 			}
 			
 			if(nextTask != null){

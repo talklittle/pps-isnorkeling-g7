@@ -6,7 +6,7 @@ import isnork.sim.SeaLifePrototype;
 import java.awt.geom.Point2D;
 import java.util.Set;
 
-public class Task implements Comparable {
+public class Task implements Comparable<Task> {
 	
 	private OurObservation observation;
 	private double priorityScore = 0; 
@@ -38,21 +38,12 @@ public class Task implements Comparable {
 		return observation;
 	}
 	
-	public int compareTo(Task otherTask){
-		if (this.priorityScore < otherTask.getPriorityScore())
-			return -1;
-		else if (this.priorityScore > otherTask.getPriorityScore())
-			return 1;
-		else
-			return 0;
-	}
-	
 	public void discountPriorityScore(double discount){
 		priorityScore *= (1-discount);
 	}
 
 	@Override
-	public int compareTo(Object otherTask) {
+	public int compareTo(Task otherTask) {
 		if (this.priorityScore < ((Task) otherTask).getPriorityScore())
 			return -1;
 		else if (this.priorityScore > ((Task) otherTask).getPriorityScore())
