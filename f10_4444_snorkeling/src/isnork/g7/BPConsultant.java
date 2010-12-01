@@ -207,10 +207,14 @@ public class BPConsultant extends Player {
 				if(task!=null)
 				{
 					/** Elizabeth, please see this code below */
-					if(myPosition.distance(task.getObservation().getTheLocation().getLocation()) < 5)
-						task =null;
-					else
-						direction = Tracker.track(null, myPosition, task.getObservation().getTheLocation().getLocation());
+					Point2D objCoord = task.getObservation().getTheLocation().getLocation();
+					
+					if (objCoord!=null){
+						if(myPosition.distance(task.getObservation().getTheLocation().getLocation()) < 5)
+							task =null;
+						else
+							direction = Tracker.track(null, myPosition, task.getObservation().getTheLocation().getLocation());
+					}
 				}
 				//else rando walk
 			}

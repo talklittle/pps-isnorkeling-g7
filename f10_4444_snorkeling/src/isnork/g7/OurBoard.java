@@ -69,8 +69,10 @@ public class OurBoard {
 		
 		System.out.println("observation:" + observation);
 		System.out.println("observation.getTheLocation():" + observation.getTheLocation());
-
+		System.out.println("observation.getTheLocation().getLocation():" + observation.getTheLocation().getLocation());
 		
+		if(obsLocation!=null){
+
 		double x = obsLocation.getX();
 		double y = obsLocation.getY();
 		
@@ -80,7 +82,9 @@ public class OurBoard {
 		double dz = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
 		
 		return dz;
-		
+		}
+		else 
+			return 1000;
 	}
 	
 	public boolean inBounds(int x, int y) {
