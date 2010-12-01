@@ -12,6 +12,7 @@ public class OurObservation extends Observation {
 	private Set<SeaLifePrototype> seaLifePossibilities;
 	private int playerID = -1; 
 	private Set<Observation> playerLocations;
+	private Point2D location;
 	
 	public OurObservation(String creatureName, int playerID, Set<SeaLifePrototype> seaLifePossibilities, Set<Observation> playerLocations){
 		super();
