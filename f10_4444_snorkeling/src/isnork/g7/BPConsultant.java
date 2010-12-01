@@ -154,6 +154,8 @@ public class BPConsultant extends Player {
 			//add stuff to queue
 		}
 		
+		System.out.println("snorkMessage: " + snorkMessage);
+		
 		return snorkMessage;
 	}
 	
@@ -165,14 +167,17 @@ public class BPConsultant extends Player {
 //		if (getRemainingTime() <= NavigateToBoat.getTimeToBoat(whereIAm) + boatTimeBufferAdjusted || shouldReturnToBoat) {
 		if (getRemainingTime() <= 180) {
 			shouldReturnToBoat = true;
+			System.out.println("Returning to the boat.");
 			// If not enough time, ignore all dangerous creatures and return to boat.
 			if (getRemainingTime() < NavigateToBoat.getTimeToBoat(whereIAm) + 6) {
 				direction = NavigateToBoat.getShortestDirectionToBoat(whereIAm);
+				System.out.println("No time to avoid danger");
 			}
 			// If there are at least 6 spare minutes, that lets you maneuver around dangerous creatures,
 			// even going diagonally away from boat once.
 			else {
-				Direction preferredDirectionToBoat = NavigateToBoat.getShortestDirectionToBoat(whereIAm);
+				System.out.println("Returning to boat but trying to avoid danger still")
+;				Direction preferredDirectionToBoat = NavigateToBoat.getShortestDirectionToBoat(whereIAm);
 				direction = dangerFinder.findSafestDirection(myPosition, myPreviousPosition,
 						whatYouSee, preferredDirectionToBoat, true);
 			}
@@ -202,10 +207,10 @@ public class BPConsultant extends Player {
 				if(task!=null)
 				{
 					/** Elizabeth, please see this code below */
-					if(myPosition.distance(task.getObservation().getLocation()) < 5)
+					if(myPosition.distance(task.getObservation().getTheLocation().getLocation()) < 5)
 						task =null;
 					else
-						direction = Tracker.track(null, myPosition, task.getObservation().getLocation());
+						direction = Tracker.track(null, myPosition, task.getObservation().getTheLocation().getLocation());
 				}
 				//else rando walk
 			}
@@ -214,6 +219,8 @@ public class BPConsultant extends Player {
 					whatYouSee, direction, false);
 			
 			if (d == null){
+				
+				//Why would d ever be null? There should always be a safest direction.
 				d = getNewDirection();
 			
 

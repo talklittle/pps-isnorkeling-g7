@@ -67,7 +67,14 @@ public class OurBoard {
 		
 		Point2D obsLocation = observation.getTheLocation().getLocation();
 		
-		double dx = Math.abs(obsLocation.getX() - myCurrentLocation.getX());
+		System.out.println("observation:" + observation);
+		System.out.println("observation.getTheLocation():" + observation.getTheLocation());
+
+		
+		double x = obsLocation.getX();
+		double y = obsLocation.getY();
+		
+		double dx = Math.abs(x - myCurrentLocation.getX());
 		double dy = Math.abs(obsLocation.getY() - myCurrentLocation.getY());
 
 		double dz = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
