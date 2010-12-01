@@ -44,6 +44,7 @@ public class BPConsultant extends Player {
 	private OurBoard ourBoard;
 	private DangerFinder dangerFinder;
 	private Point2D myPosition = null;
+	private Point2D myPreviousPosition = null;
 	private Set<Observation> whatYouSee = null;
 	private Point2D beast = null;
 	private TaskManager taskManager;
@@ -62,6 +63,7 @@ public class BPConsultant extends Player {
 	@Override
 	public String tick(Point2D myPosition, Set<Observation> whatYouSee,
 			Set<iSnorkMessage> incomingMessages,Set<Observation> playerLocations) {
+		this.myPreviousPosition = this.myPosition;
 		this.myPosition = myPosition;
 		this.whatYouSee = whatYouSee;
 		taskManager.setPlayerLocations(playerLocations);
@@ -160,7 +162,8 @@ public class BPConsultant extends Player {
 	@Override
 	public Direction getMove() {	
 		// Head back to boat if we are running low on time (shortest time back, plus a buffer)
-		if (getRemainingTime() <= NavigateToBoat.getTimeToBoat(whereIAm) + boatTimeBufferAdjusted || shouldReturnToBoat) {
+//		if (getRemainingTime() <= NavigateToBoat.getTimeToBoat(whereIAm) + boatTimeBufferAdjusted || shouldReturnToBoat) {
+		if (getRemainingTime() <= 180) {
 			shouldReturnToBoat = true;
 			// If not enough time, ignore all dangerous creatures and return to boat.
 			if (getRemainingTime() < NavigateToBoat.getTimeToBoat(whereIAm) + 6) {
@@ -170,7 +173,8 @@ public class BPConsultant extends Player {
 			// even going diagonally away from boat once.
 			else {
 				Direction preferredDirectionToBoat = NavigateToBoat.getShortestDirectionToBoat(whereIAm);
-				direction = dangerFinder.findSafestDirection(myPosition, whatYouSee, preferredDirectionToBoat, true);
+				direction = dangerFinder.findSafestDirection(myPosition, myPreviousPosition,
+						whatYouSee, preferredDirectionToBoat, true);
 			}
 			//logger.debug("(boat) remaining: " + getRemainingTime() + " whereIAm:"+whereIAm + " (dir "+direction+")");
 			return direction;
@@ -206,7 +210,8 @@ public class BPConsultant extends Player {
 				//else rando walk
 			}
 			
-			Direction d = dangerFinder.findSafestDirection(myPosition, whatYouSee, direction, false);
+			Direction d = dangerFinder.findSafestDirection(myPosition, myPreviousPosition,
+					whatYouSee, direction, false);
 			
 			if (d == null){
 				d = getNewDirection();
