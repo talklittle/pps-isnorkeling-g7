@@ -10,6 +10,9 @@ import isnork.sim.Observation;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Set;
 
 
@@ -42,7 +45,14 @@ public class BPConsultant extends Player {
 	private DangerFinder dangerFinder;
 	private Point2D myPosition = null;
 	private Set<Observation> whatYouSee = null;
+	private Point2D beast = null;
 	private TaskManager taskManager;
+	private boolean isTracker = false;
+	private boolean isSeeker = false;
+	private boolean curTracking = false;
+	private SeaLifePrototype toTrack = null;
+	private Point2D trackLocal = null;
+	private Task task = null;
 	
 	@Override
 	public String getName() {
@@ -56,14 +66,92 @@ public class BPConsultant extends Player {
 		this.whatYouSee = whatYouSee;
 		taskManager.setPlayerLocations(playerLocations);
 		
+		Observation[] a = new Observation[whatYouSee.size()];
+		ArrayList<OurObservation> o = new ArrayList<OurObservation>();
+		whatYouSee.toArray(a);
+		for(int i=0; i<a.length;i++)
+		{
+			if(a[i].getId()>1)
+			{
+				o.add(new OurObservation(a[i]));
+			}
+		}
+		Collections.sort(o);
+		
 		String snorkMessage = null;
 		whereIAm = myPosition;
-		if(n % 10 == 0)
-			snorkMessage = "s";
-		else
-			snorkMessage = null;
-		
 		round++;
+		
+		if(isTracker)
+		{
+			//look at all creatures
+			//if tracking, return highest static creature
+			if(curTracking)
+			{
+				//update trackLocal
+				boolean change = false;
+				for(OurObservation ob : o)
+				{
+					if(ob.getName() == toTrack.getName())
+					{
+						change = true;
+						trackLocal = ob.getLocation();
+					}
+				}
+				if(!change)
+					curTracking=false;
+				
+				for(OurObservation ob: o)
+				{
+					snorkMessage = MessageTranslator.getMessage(ob.o.getName());
+					if(MessageTranslator.hm.get(snorkMessage).getSpeed() == 0)
+					{
+						logger.debug("tracker sees: " +snorkMessage);
+						return snorkMessage;
+					}
+				}
+				return null;
+			}
+			//else
+			//if highest scoring is moving, track
+			for(OurObservation ob: o)
+			{
+				snorkMessage = MessageTranslator.getMessage(ob.o.getName());
+				if(MessageTranslator.hm.get(snorkMessage).getSpeed() > 0)
+				{
+				//	logger.debug("tracking: " +snorkMessage);
+					curTracking = true;
+					toTrack = MessageTranslator.hm.get(snorkMessage);
+					trackLocal = ob.o.getLocation();
+					return snorkMessage;
+				}
+			}
+			//else return highest static creature
+		}
+		else
+		{
+			//read messages
+			iSnorkMessage temp = null;
+			String mess = null;
+			SeaLifePrototype obs = null;
+			Iterator<iSnorkMessage> it = incomingMessages.iterator();
+			while(it.hasNext())
+			{
+				temp = it.next();
+				mess= temp.getMsg();
+				obs = MessageTranslator.hm.get(mess);
+				if(obs.getSpeed() == 0)
+				{
+					taskManager.addTask(obs.getName(), temp.getLocation());
+				}
+				else
+				{
+					taskManager.addTask(obs.getName(), temp.getSender());
+				}
+			}
+			//add stuff to queue
+		}
+		
 		return snorkMessage;
 	}
 	
@@ -84,30 +172,54 @@ public class BPConsultant extends Player {
 				Direction preferredDirectionToBoat = NavigateToBoat.getShortestDirectionToBoat(whereIAm);
 				direction = dangerFinder.findSafestDirection(myPosition, whatYouSee, preferredDirectionToBoat, true);
 			}
-			logger.debug("(boat) remaining: " + getRemainingTime() + " whereIAm:"+whereIAm + " (dir "+direction+")");
+			//logger.debug("(boat) remaining: " + getRemainingTime() + " whereIAm:"+whereIAm + " (dir "+direction+")");
 			return direction;
 		} else {
-//			logger.debug("(normal) remaining: " + getRemainingTime() + " whereIAm:"+whereIAm + " (dir "+d+")");
-			//Direction d = getNewDirection();
+			//logger.trace("in getMove()");
 			
-			logger.trace("in getMove()");
+			if(isTracker)
+			{
+				//if tracking track
+				if(curTracking)
+				{
+					logger.debug(myPosition + " " + trackLocal);
+					return Tracker.track(toTrack, myPosition, trackLocal);
+				}
+				//else rando-walk
+				//return Tracker.track(null, myPosition, beast);
+			}
+			else
+			{
+				//if on task, go
+				if(task == null)
+				{
+					task = taskManager.getNextTask(myPosition);
+				}
+				if(task!=null)
+				{
+					/** Elizabeth, please see this code below */
+					if(myPosition.distance(task.getObservation().getLocation()) < 5)
+						task =null;
+					else
+						direction = Tracker.track(null, myPosition, task.getObservation().getLocation());
+				}
+				//else rando walk
+			}
 			
 			Direction d = dangerFinder.findSafestDirection(myPosition, whatYouSee, direction, false);
-//			dangerFinder.printSurroundingDanger();
 			
 			if (d == null){
 				d = getNewDirection();
-			}
 			
-			
-			
-			Point2D p = new Point2D.Double(whereIAm.getX() + d.dx,
-					whereIAm.getY() + d.dy);
-			while (Math.abs(p.getX()) > GameConfig.d
-					|| Math.abs(p.getY()) > GameConfig.d) {
-				d = getNewDirection();
-				p = new Point2D.Double(whereIAm.getX() + d.dx,
+
+				Point2D p = new Point2D.Double(whereIAm.getX() + d.dx,
 						whereIAm.getY() + d.dy);
+				while (Math.abs(p.getX()) > GameConfig.d
+						|| Math.abs(p.getY()) > GameConfig.d) {
+					d = getNewDirection();
+					p = new Point2D.Double(whereIAm.getX() + d.dx,
+							whereIAm.getY() + d.dy);
+				}
 			}
 			return d;
 		}
@@ -127,6 +239,12 @@ public class BPConsultant extends Player {
 		this.dangerFinder = new DangerFinder(ourBoard, seaLifePossibilities, random);
 		
 		taskManager = new TaskManager(seaLifePossibilities, ourBoard);
+		MessageTranslator.initializeMap(seaLifePossibilities);
+		
+		if(Math.random() >= 0.5)
+			isTracker = true;
+		else
+			isSeeker = true;
 	}
 
 

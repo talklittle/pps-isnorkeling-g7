@@ -26,11 +26,10 @@ public class MessageTranslator {
 		while(it.hasNext())
 		{
 			String a = it.next();
-			System.out.println(a+" "+hm.get(a));
 		}
 	}	
 	
-	public String getMessage(String name)
+	public static String getMessage(String name)
 	{
 		for(int i =0; i<sl.size();i++)
 		{

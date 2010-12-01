@@ -5,7 +5,7 @@ import java.util.Set;
 
 import isnork.sim.*;
 
-public class OurObservation extends Observation {
+public class OurObservation extends Observation implements Comparable<Observation> {
 	
 	private boolean isValid;
 	private String creatureName;
@@ -13,6 +13,13 @@ public class OurObservation extends Observation {
 	private int playerID = -1; 
 	private Set<Observation> playerLocations;
 	private Point2D location;
+	
+	public Observation o;
+	
+	public OurObservation(Observation _o)
+	{
+		o = _o;
+	}
 	
 	public OurObservation(String creatureName, int playerID, Set<SeaLifePrototype> seaLifePossibilities, Set<Observation> playerLocations){
 		super();
@@ -68,5 +75,14 @@ public class OurObservation extends Observation {
 	
 	public void setLocation(Point2D coord){
 		location = coord;
+	}
+
+	@Override
+	public int compareTo(Observation oo) {
+		if(o.happiness()>oo.happiness())
+			return -1;
+		if(o.happiness()<oo.happiness())
+			return 1;
+		return 0;
 	}
 }
