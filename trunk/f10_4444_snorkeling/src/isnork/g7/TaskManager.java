@@ -28,6 +28,8 @@ public class TaskManager {
 		this.seaLifePossibilities = seaLifePossibilities;
 		this.ourBoard = ourBoard;
 		
+		seenCreatures = new HashMap<String, Integer>();
+		
 		for(SeaLifePrototype s: seaLifePossibilities){
 			seenCreatures.put(s.getName(), 0);
 		}
@@ -61,8 +63,8 @@ public class TaskManager {
 	
 	/*To add tasks with static creature and fixed position associated*/
 	public void addTask(String creatureName, Point2D coordinate){
-		Task task = new Task(creatureName, ourBoard, seaLifePossibilities, playerLocations);
-		task.getObservation().setLocation(coordinate);
+		Task task = new Task(creatureName, coordinate, ourBoard, seaLifePossibilities, playerLocations);
+		//task.getObservation().setLocation(coordinate);
 		taskList.add(task);
 		seenObjects.put(task, false);
 		
@@ -124,6 +126,12 @@ public class TaskManager {
 			nextTask = taskIterator.next();
 			nextTask.updatePriorityScore(myCurrentLocation);
 			hasNextTask = taskIterator.hasNext();
+		}
+	}
+	
+	public void updatePlayerLocations(Set<Observation> playerLocations){
+		for(Task task : taskList){
+			task.updatePlayerLocations(playerLocations);
 		}
 	}
 }

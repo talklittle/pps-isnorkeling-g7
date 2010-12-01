@@ -4,9 +4,8 @@ package isnork.g0;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Set;
-
-import isnork.sim.GameConfig;
 import isnork.sim.Observation;
+import isnork.sim.GameConfig;
 import isnork.sim.Player;
 import isnork.sim.SeaLife;
 import isnork.sim.SeaLifePrototype;
@@ -45,7 +44,7 @@ public class DumbPlayer0 extends Player {
 	@Override
 	public Direction getMove() {
 		Direction d = getNewDirection();
-		
+	
 		Point2D p = new Point2D.Double(whereIAm.getX() + d.dx,
 				whereIAm.getY() + d.dy);
 		while (Math.abs(p.getX()) > GameConfig.d

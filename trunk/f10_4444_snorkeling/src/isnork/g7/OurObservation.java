@@ -12,7 +12,7 @@ public class OurObservation extends Observation implements Comparable<Observatio
 	private Set<SeaLifePrototype> seaLifePossibilities;
 	private int playerID = -1; 
 	private Set<Observation> playerLocations;
-	private Point2D location;
+	private Location ourLocation;
 	
 	public Observation o;
 	
@@ -23,14 +23,16 @@ public class OurObservation extends Observation implements Comparable<Observatio
 	
 	public OurObservation(String creatureName, int playerID, Set<SeaLifePrototype> seaLifePossibilities, Set<Observation> playerLocations){
 		super();
+		this.ourLocation = new Location(playerID);
 		this.creatureName = creatureName;
 		this.isValid = true;
 		this.seaLifePossibilities = seaLifePossibilities;
 		this.playerID = playerID;
 	}
 	
-	public OurObservation(String creatureName, Set<SeaLifePrototype> seaLifePossibilities, Set<Observation> playerLocations){
+	public OurObservation(String creatureName, Point2D coordinate, Set<SeaLifePrototype> seaLifePossibilities, Set<Observation> playerLocations){
 		super();
+		this.ourLocation = new Location(coordinate);
 		this.creatureName = creatureName;
 		this.isValid = true;
 		this.seaLifePossibilities = seaLifePossibilities;
@@ -49,15 +51,14 @@ public class OurObservation extends Observation implements Comparable<Observatio
 		return creatureName;
 	}
 	
-	public Point2D getLocation(){
-		if (playerID != -1){
-			return getPlayer(playerID).getLocation();
-		}
-		else{
-			return super.getLocation();
-		}
+	public Location getTheLocation(){
+		return ourLocation;
 	}
 	
+	
+	public Point2D getCoordinate(){
+		return ourLocation.getLocation();
+	}
 	
 	public Observation getPlayer(int playerID){
 		Iterator<Observation> playerIterator = playerLocations.iterator();
@@ -74,7 +75,7 @@ public class OurObservation extends Observation implements Comparable<Observatio
 	}
 	
 	public void setLocation(Point2D coord){
-		location = coord;
+		ourLocation = new Location(coord);
 	}
 
 	@Override

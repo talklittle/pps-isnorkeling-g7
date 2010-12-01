@@ -1,6 +1,5 @@
 
 package isnork.sim;
-
 import isnork.sim.GameObject.Direction;
 
 import java.awt.geom.Point2D;

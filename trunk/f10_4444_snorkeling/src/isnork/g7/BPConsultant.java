@@ -66,7 +66,7 @@ public class BPConsultant extends Player {
 		this.myPreviousPosition = this.myPosition;
 		this.myPosition = myPosition;
 		this.whatYouSee = whatYouSee;
-		taskManager.setPlayerLocations(playerLocations);
+		taskManager.updatePlayerLocations(playerLocations);
 		
 		Observation[] a = new Observation[whatYouSee.size()];
 		ArrayList<OurObservation> o = new ArrayList<OurObservation>();
