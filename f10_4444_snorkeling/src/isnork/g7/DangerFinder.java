@@ -85,7 +85,7 @@ public class DangerFinder {
 				Point2D loc = new Point2D.Double(
 						predictedLocations.get(0).getX() + d.getDx(),
 						predictedLocations.get(0).getY() + d.getDy());
-				logger.trace("predictedLocations.add("+loc+")");
+			//	logger.trace("predictedLocations.add("+loc+")");
 				predictedLocations.add(loc);
 			}
 			
@@ -98,7 +98,7 @@ public class DangerFinder {
 				Direction directionToCreature = ourBoard.getDirectionTowards(myPosition, predictedLocations.get(i));
 				double distanceToCreature = myPosition.distance(predictedLocations.get(i));
 				
-				logger.debug("Direction:"+directionToCreature+" distanceToCreature = " + distanceToCreature);
+				//logger.debug("Direction:"+directionToCreature+" distanceToCreature = " + distanceToCreature);
 
 				// Only consider dangerous creatures if:
 				// 1. They are stationary and affect cells next to the diver, OR
@@ -110,7 +110,7 @@ public class DangerFinder {
 					
 					if (directionDanger.containsKey(directionToCreature)) {
 						formerDirectionDanger = directionDanger.get(directionToCreature);
-						logger.debug("formerDirectionDanger = " + formerDirectionDanger);
+						//logger.debug("formerDirectionDanger = " + formerDirectionDanger);
 					}
 						
 					directionDanger.put(directionToCreature, new Double(formerDirectionDanger + Math.abs(happy*DANGER_MULTIPLIER)));
@@ -125,7 +125,7 @@ public class DangerFinder {
 		this.whatYouSee = whatYouSee;
 		
 		for (Direction d: Direction.values()){
-			logger.debug("d: " + d);
+		//	logger.debug("d: " + d);
 			directionDanger.clear();
 		}
 	}
@@ -133,12 +133,12 @@ public class DangerFinder {
 	public void printSurroundingDanger(){
 		logger.debug("Here's the danger surrounding the diver at " + myPosition + ":");
 		
-		for (Direction d : directionDanger.keySet()){
-			if (d!= null)
-				logger.debug(d.toString() + ": " + directionDanger.get(d));
-		}
+		//for (Direction d : directionDanger.keySet()){
+		//	if (d!= null)
+			//	logger.debug(d.toString() + ": " + directionDanger.get(d));
+		//}
 		
-		logger.debug("I want to head in direction " + mySafestDirection + ":");
+		//logger.debug("I want to head in direction " + mySafestDirection + ":");
 
 	}
 	
@@ -147,7 +147,7 @@ public class DangerFinder {
 		updateCoordinates(myPosition, whatYouSee);
 		findDanger();
 		
-		logger.debug("in find safest direction");
+		//logger.debug("in find safest direction");
 		double minDanger = Integer.MAX_VALUE;
 		double maxDanger = 0;
 		
@@ -157,7 +157,7 @@ public class DangerFinder {
 			double curDanger;
 			if (directionDanger.containsKey(d)) {
 				curDanger = Math.abs(directionDanger.get(d));
-				logger.trace("directionDanger.get("+d+") = "+curDanger);
+				//logger.trace("directionDanger.get("+d+") = "+curDanger);
 			} else {
 				curDanger = 0;
 			}
@@ -166,7 +166,7 @@ public class DangerFinder {
 			
 			if (curDanger > maxDanger){
 //				safestDirection = ourBoard.getOppositeDirection(d);
-				logger.debug("Max Danger so far in Direction: " + d);
+				//logger.debug("Max Danger so far in Direction: " + d);
 
 				maxDanger = curDanger;
 			}
@@ -174,7 +174,7 @@ public class DangerFinder {
 			if (curDanger < minDanger) {
 				safestDirections.clear();
 				safestDirections.add(d);
-				logger.debug("Min Danger so far in Direction: " + d);
+				//logger.debug("Min Danger so far in Direction: " + d);
 				
 				minDanger = curDanger;
 			}
@@ -205,7 +205,7 @@ public class DangerFinder {
 				mySafestDirection = safestDirections.get(0);
 			}
 		}
-		logger.debug("Safest direction: " + mySafestDirection + " (from among " + safestDirections.toString() + ")");
+		//logger.debug("Safest direction: " + mySafestDirection + " (from among " + safestDirections.toString() + ")");
 		return mySafestDirection;
 	}
 
