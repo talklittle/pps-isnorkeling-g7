@@ -27,6 +27,10 @@ public class TaskManager {
 		seenObjects = new HashMap<Task, Boolean>();
 		this.seaLifePossibilities = seaLifePossibilities;
 		this.ourBoard = ourBoard;
+		
+		for(SeaLifePrototype s: seaLifePossibilities){
+			seenCreatures.put(s.getName(), 0);
+		}
 	}
 	
 	public void setPlayerLocations(Set<Observation> playerLocations){
@@ -50,6 +54,7 @@ public class TaskManager {
 		seenObjects.put(task, false);
 		
 		int numPreviousSightings = seenCreatures.get(creatureName).intValue();
+	
 		task.discountPriorityScore((1.0/(1+numPreviousSightings)));
 		seenCreatures.put(creatureName, new Integer(numPreviousSightings++));
 	}
@@ -70,17 +75,23 @@ public class TaskManager {
 	/*Will return null if there are no valid remaining tasks in the queue*/
 	public Task getNextTask(Point2D myCurrentLocation){
 		updatePriorityScores(myCurrentLocation);
-		Task nextTask = taskList.remove();
 		
-		while (!nextTask.getObservation().isValid() || !taskUnseen(nextTask)){
+		Task nextTask;
+
+		if(!taskList.isEmpty()){
 			nextTask = taskList.remove();
+		
+			while(!taskList.isEmpty()&&!nextTask.getObservation().isValid() || !taskUnseen(nextTask)){
+				nextTask = taskList.remove();
+			}
+			
+			if(nextTask != null){
+				markTaskComplete(nextTask);
+				return nextTask;
+			}
 		}
 		
-		if(nextTask != null){
-			markTaskComplete(nextTask);
-		}
-		
-		return nextTask;
+		return null;
 	}
 	
 	private boolean taskUnseen(Task task){
@@ -106,10 +117,13 @@ public class TaskManager {
 	private void updatePriorityScores(Point2D myCurrentLocation){
 		Iterator<Task> taskIterator = taskList.iterator();
 		
-		Task nextTask = taskIterator.next();
+		Task nextTask;
+		boolean hasNextTask = taskIterator.hasNext();
 		
-		while (nextTask != null){
+		while (hasNextTask){
+			nextTask = taskIterator.next();
 			nextTask.updatePriorityScore(myCurrentLocation);
+			hasNextTask = taskIterator.hasNext();
 		}
 	}
 }
