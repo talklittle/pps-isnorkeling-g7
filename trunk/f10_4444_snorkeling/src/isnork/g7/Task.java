@@ -20,7 +20,7 @@ public class Task implements Comparable {
 	}
 	
 	public Task(String creatureName, Point2D coordinate, OurBoard ourBoard, Set<SeaLifePrototype> seaLifePossibilities, Set<Observation> playerLocations){
-		this.observation = new OurObservation(creatureName, coordinate, seaLifePossibilities, playerLocations);
+		observation = new OurObservation(creatureName, coordinate, seaLifePossibilities, playerLocations);
 		this.ourBoard = ourBoard; 
 		this.seaLifePossibilities = seaLifePossibilities;
 

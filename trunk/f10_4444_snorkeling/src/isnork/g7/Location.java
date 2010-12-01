@@ -35,8 +35,10 @@ public class Location {
 	}
 	
 	private Point2D getPlayerLocation(int playerID){
+		System.out.println("playerLocations");
+		System.out.println(playerLocations);
 		for (Observation player : playerLocations){
-			if(player.getId() == playerID){
+			if(player.getId() == playerID  && player!=null){
 				return player.getLocation();
 			}
 		}
