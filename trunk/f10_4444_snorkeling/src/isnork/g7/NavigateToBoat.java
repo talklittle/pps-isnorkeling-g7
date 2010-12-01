@@ -62,7 +62,7 @@ public class NavigateToBoat {
 				numDangerousCreatures += life.getMaxCount();
 			}
 		}
-		// it takes 14 minutes to go around a 3x3 square
+		// it takes 14 minutes to go around a 3x3 square, versus 8 minutes to go straight through
 		return baseTime + (14 * numDangerousCreatures / 4 / (d * d));
 	}
 }

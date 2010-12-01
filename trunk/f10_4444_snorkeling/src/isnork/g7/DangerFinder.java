@@ -21,6 +21,7 @@ public class DangerFinder {
 	private static final double DANGER_MAX_DISTANCE = 5.0;
 	private static final double STATIONARY_DANGER_DISTANCE = 1.5;
 	private Point2D myPosition;
+	private Point2D myPreviousPosition;
 	private Set<Observation> whatYouSee;
 	private OurBoard ourBoard;
 	private Set<SeaLifePrototype> seaLifePossibilities;
@@ -120,8 +121,9 @@ public class DangerFinder {
 		}
 	}
 	
-	public void updateCoordinates(Point2D myPosition, Set<Observation> whatYouSee){
+	public void updateCoordinates(Point2D myPosition, Point2D myPreviousPosition, Set<Observation> whatYouSee){
 		this.myPosition = myPosition;
+		this.myPreviousPosition = myPreviousPosition;
 		this.whatYouSee = whatYouSee;
 		
 		for (Direction d: Direction.values()){
@@ -142,15 +144,16 @@ public class DangerFinder {
 
 	}
 	
-	public Direction findSafestDirection(Point2D myPosition, Set<Observation> whatYouSee, Direction preferredDirection,
-			boolean shouldReturnToBoat){
-		updateCoordinates(myPosition, whatYouSee);
+	public Direction findSafestDirection(Point2D myPosition, Point2D myPreviousPosition,
+			Set<Observation> whatYouSee, Direction preferredDirection, boolean shouldReturnToBoat){
+		updateCoordinates(myPosition, myPreviousPosition, whatYouSee);
 		findDanger();
 		
 		//logger.debug("in find safest direction");
 		double minDanger = Integer.MAX_VALUE;
 		double maxDanger = 0;
 		
+		ArrayList<DirectionAndDanger> directionsSafeToDangerous = new ArrayList<DirectionAndDanger>();
 		ArrayList<Direction> safestDirections = new ArrayList<Direction>();
 		
 		for (Direction d : Direction.values()){
@@ -164,13 +167,6 @@ public class DangerFinder {
 			
 //			logger.debug("current danger in direction " + d + ":" + curDanger);
 			
-			if (curDanger > maxDanger){
-//				safestDirection = ourBoard.getOppositeDirection(d);
-				//logger.debug("Max Danger so far in Direction: " + d);
-
-				maxDanger = curDanger;
-			}
-			
 			if (curDanger < minDanger) {
 				safestDirections.clear();
 				safestDirections.add(d);
@@ -181,20 +177,33 @@ public class DangerFinder {
 			else if (curDanger == minDanger) {
 				safestDirections.add(d);
 			}
+
+			
+			directionsSafeToDangerous.add(new DirectionAndDanger(d, curDanger));
 		} 
 		
+		// Sort from least dangerous to most dangerous
+		Collections.sort(directionsSafeToDangerous);
+		
+		mySafestDirection = null;
 		if (shouldReturnToBoat) {
 			// If returning to boat, always head in preferredDirection if it is among the safest
 			if (preferredDirection != null && safestDirections.contains(preferredDirection)) {
 				mySafestDirection = preferredDirection;
 			} else {
 				// Prioritize the directions closer to the safest
+				// And de-prioritize the previous location
+				Direction previousDirection = ourBoard.getDirectionTowards(myPosition, myPreviousPosition);
 				for (Direction d : DirectionUtil.getClosestDirections(preferredDirection)) {
-					if (safestDirections.contains(d)) {
+					if (safestDirections.contains(d) && !d.equals(previousDirection)) {
 						mySafestDirection = d;
 						break;
 					}
 				}
+				// We excluded previous direction in above loop.
+				// If mySafestDirection == null, that means safest is previous direction.
+				if (mySafestDirection == null)
+					mySafestDirection = directionsSafeToDangerous.get(0).getDirection();
 			}
 		} else {
 			// 80% of the time, continue in preferredDirection if it is among the safest
