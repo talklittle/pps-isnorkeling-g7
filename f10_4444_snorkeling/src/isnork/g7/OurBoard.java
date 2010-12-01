@@ -65,7 +65,8 @@ public class OurBoard {
 	
 	public double findDistanceToObservation(OurObservation observation, Point2D myCurrentLocation){
 		
-		Point2D obsLocation = observation.getLocation();
+		Point2D obsLocation = observation.getTheLocation().getLocation();
+		
 		double dx = Math.abs(obsLocation.getX() - myCurrentLocation.getX());
 		double dy = Math.abs(obsLocation.getY() - myCurrentLocation.getY());
 

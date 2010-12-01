@@ -6,6 +6,7 @@
  */
 package isnork.sim;
 
+import isnork.g7.OurObservation;
 import isnork.sim.GameListener.GameUpdateType;
 import isnork.sim.GameObject.Direction;
 import isnork.sim.ui.GUI;
