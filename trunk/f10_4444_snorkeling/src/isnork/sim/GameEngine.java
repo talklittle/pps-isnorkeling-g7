@@ -6,7 +6,6 @@
  */
 package isnork.sim;
 
-import isnork.g7.OurObservation;
 import isnork.sim.GameListener.GameUpdateType;
 import isnork.sim.GameObject.Direction;
 import isnork.sim.ui.GUI;
@@ -34,7 +33,7 @@ public final class GameEngine {
 	static {
 		PropertyConfigurator.configure("logger.properties");
 	}
-
+	
 	public GameEngine() {
 		config = new GameConfig();
 		gameListeners = new ArrayList<GameListener>();
@@ -153,11 +152,11 @@ public final class GameEngine {
 						beenSeenById.put(pl, new HashSet<SeaLife>());
 					if(!beenSeenByName.containsKey(pl))
 						beenSeenByName.put(pl, new HashMap<String, Integer>());
-					int happy = 0;
+					double happy = 0;
 					
 					if(!pl.location.equals(new Point2D.Double(0, 0))) { // if on the boat, doesn't affect
 					    if(s.dangerous && s.getLocation().distance(pl.location) <= 1.5)
-					        happy = happy - 2*s.happiness;
+					        happy = happy - s.happiness*2;
 					    else if(beenSeenById.get(pl).contains(s))
 					        happy = 0;
 					    else if(!beenSeenByName.get(pl).containsKey(s.getName()))
