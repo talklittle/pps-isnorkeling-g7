@@ -1,5 +1,6 @@
 
 package isnork.sim;
+
 import isnork.sim.GameObject.Direction;
 
 import java.awt.geom.Point2D;
@@ -14,16 +15,15 @@ public abstract class Player {
 
 	Point2D location;
 	int id;
-	int happiness = 0;
+	double happiness = 0;
+	public double getHappiness()
+	{
+		return happiness;
+	}
 	public int getId()
 	{
 		return id;
 	}
-	public int getHappiness()
-    {
-        return happiness;
-    }
-
     /**
      * Returns the name for this player
      */
