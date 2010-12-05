@@ -154,7 +154,7 @@ public class BPConsultant extends Player {
 			//add stuff to queue
 		}
 		
-		System.out.println("snorkMessage: " + snorkMessage);
+		logger.debug("snorkMessage: " + snorkMessage);
 		
 		return snorkMessage;
 	}
@@ -167,16 +167,16 @@ public class BPConsultant extends Player {
 //		if (getRemainingTime() <= NavigateToBoat.getTimeToBoat(whereIAm) + boatTimeBufferAdjusted || shouldReturnToBoat) {
 		if (getRemainingTime() <= 180) {
 			shouldReturnToBoat = true;
-			System.out.println("Returning to the boat.");
+			logger.debug("Returning to the boat.");
 			// If not enough time, ignore all dangerous creatures and return to boat.
 			if (getRemainingTime() < NavigateToBoat.getTimeToBoat(whereIAm) + 6) {
 				direction = NavigateToBoat.getShortestDirectionToBoat(whereIAm);
-				System.out.println("No time to avoid danger");
+				logger.debug("No time to avoid danger");
 			}
 			// If there are at least 6 spare minutes, that lets you maneuver around dangerous creatures,
 			// even going diagonally away from boat once.
 			else {
-				System.out.println("Returning to boat but trying to avoid danger still")
+				logger.debug("Returning to boat but trying to avoid danger still")
 ;				Direction preferredDirectionToBoat = NavigateToBoat.getShortestDirectionToBoat(whereIAm);
 				direction = dangerFinder.findSafestDirection(myPosition, myPreviousPosition,
 						whatYouSee, preferredDirectionToBoat, true);

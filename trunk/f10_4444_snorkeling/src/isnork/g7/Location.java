@@ -1,12 +1,13 @@
 package isnork.g7;
 
 
+import isnork.sim.Observation;
+
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.Set;
 
-
-import isnork.sim.*;
+import org.apache.log4j.Logger;
 
 
 public class Location {
@@ -14,6 +15,8 @@ public class Location {
 	private Point2D coordinate;
 	private int playerID = -1;
 	private Set<Observation> playerLocations;
+	
+	private Logger logger = Logger.getLogger(Location.class);
 	
 	public Location(Point2D coordinate){
 		this.coordinate = coordinate;
@@ -25,12 +28,12 @@ public class Location {
 	
 	public Point2D getLocation(){
 		if (playerID != -1){
-			System.out.println("Getting location from player " + playerID);
+			logger.trace("Getting location from player " + playerID);
 			//TRAVERSE CURRENT PLAYER LOCATION LIST AND RETURN THAT LOCATION
 			return getPlayerLocation(playerID);
 		}
 		else{
-			System.out.println("Returning a static coordinate");
+			logger.trace("Returning a static coordinate");
 			return coordinate;
 		}
 	}
@@ -40,8 +43,7 @@ public class Location {
 	}
 	
 	private Point2D getPlayerLocation(int playerID){
-		System.out.println("playerLocations");
-		System.out.println(playerLocations);
+		logger.debug("playerLocations: " + playerLocations);
 		
 		if(playerLocations!= null){
 			Iterator<Observation> playerIterator = playerLocations.iterator();

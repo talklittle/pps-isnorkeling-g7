@@ -1,11 +1,16 @@
 package isnork.g7;
 
-import java.awt.geom.Point2D;
 import isnork.sim.GameObject.Direction;
+
+import java.awt.geom.Point2D;
+
+import org.apache.log4j.Logger;
 
 public class OurBoard {
 	
 	int d;
+	
+	private Logger logger = Logger.getLogger(OurBoard.class);
 	
 	public OurBoard(int d) {
 		this.d = d;
@@ -67,9 +72,9 @@ public class OurBoard {
 		
 		Point2D obsLocation = observation.getTheLocation().getLocation();
 		
-		System.out.println("observation:" + observation);
-		System.out.println("observation.getTheLocation():" + observation.getTheLocation());
-		System.out.println("observation.getTheLocation().getLocation():" + observation.getTheLocation().getLocation());
+		logger.debug("observation:" + observation);
+		logger.debug("observation.getTheLocation():" + observation.getTheLocation());
+		logger.debug("observation.getTheLocation().getLocation():" + observation.getTheLocation().getLocation());
 		
 		if(obsLocation!=null){
 
