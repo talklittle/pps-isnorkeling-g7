@@ -8,11 +8,12 @@ import isnork.sim.SeaLifePrototype;
 import isnork.sim.GameObject.Direction;
 
 public class Tracker {
-
+	private static SeaLifePrototype seaLifePrototype; 
 	private static final Logger logger = Logger.getLogger(Tracker.class);
 	
 	public static Direction track(SeaLifePrototype s, Point2D me, Point2D beast)
 	{
+		seaLifePrototype = s;
 		return tightTrack(me, beast);
 	}
 
@@ -25,6 +26,10 @@ public class Tracker {
 		if(beast == null)
 			return null;
 		return OurBoard.getDirectionTowards(me, beast);
+	}
+	
+	public SeaLifePrototype getSeaLifePrototype(){
+		return seaLifePrototype;
 	}
 	
 }

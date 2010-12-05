@@ -12,6 +12,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -90,6 +91,8 @@ public class BPConsultant extends Player {
 			//if tracking, return highest static creature
 			if(curTracking)
 			{
+				logger.debug("Diver " + " is following " + toTrack.getName());
+				
 				//update trackLocal
 				boolean change = false;
 				for(OurObservation ob : o)
@@ -154,11 +157,36 @@ public class BPConsultant extends Player {
 			//add stuff to queue
 		}
 		
-		logger.debug("snorkMessage: " + snorkMessage);
+		//logger.debug("snorkMessage: " + snorkMessage);
 		
 		return snorkMessage;
 	}
 	
+	private int getMyID(Set<Observation> playerPositions){
+		HashMap<Integer, Boolean> notMyPosition = new HashMap<Integer, Boolean>();
+		
+		for (int i = 0; i > -n; i--){
+			notMyPosition.put(new Integer(i), false);
+		}
+		
+		Iterator<Observation> playerPositionsIt = playerPositions.iterator();
+		
+		while(playerPositionsIt.hasNext()){
+			Observation nextPlayer = playerPositionsIt.next();
+			int ID = nextPlayer.getId();
+			notMyPosition.put(ID, true);
+		}
+		
+		playerPositionsIt = playerPositions.iterator();
+		
+		for(int i = 0; i > -n; i--){
+			if (notMyPosition.get(i)==false){
+				return i;	
+			}
+		}
+	
+		return 0;
+	}
 
 		
 	@Override
@@ -167,16 +195,16 @@ public class BPConsultant extends Player {
 //		if (getRemainingTime() <= NavigateToBoat.getTimeToBoat(whereIAm) + boatTimeBufferAdjusted || shouldReturnToBoat) {
 		if (getRemainingTime() <= 180) {
 			shouldReturnToBoat = true;
-			logger.debug("Returning to the boat.");
+			//logger.debug("Returning to the boat.");
 			// If not enough time, ignore all dangerous creatures and return to boat.
 			if (getRemainingTime() < NavigateToBoat.getTimeToBoat(whereIAm) + 6) {
 				direction = NavigateToBoat.getShortestDirectionToBoat(whereIAm);
-				logger.debug("No time to avoid danger");
+				//logger.debug("No time to avoid danger");
 			}
 			// If there are at least 6 spare minutes, that lets you maneuver around dangerous creatures,
 			// even going diagonally away from boat once.
 			else {
-				logger.debug("Returning to boat but trying to avoid danger still")
+				//logger.debug("Returning to boat but trying to avoid danger still")
 ;				Direction preferredDirectionToBoat = NavigateToBoat.getShortestDirectionToBoat(whereIAm);
 				direction = dangerFinder.findSafestDirection(myPosition, myPreviousPosition,
 						whatYouSee, preferredDirectionToBoat, true);
@@ -191,7 +219,7 @@ public class BPConsultant extends Player {
 				//if tracking track
 				if(curTracking)
 				{
-					logger.debug(myPosition + " " + trackLocal);
+					//logger.debug(myPosition + " " + trackLocal);
 					return Tracker.track(toTrack, myPosition, trackLocal);
 				}
 				//else rando-walk
