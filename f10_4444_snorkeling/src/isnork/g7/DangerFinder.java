@@ -136,7 +136,7 @@ public class DangerFinder {
 	}
 	
 	public void printSurroundingDanger(){
-		logger.debug("Here's the danger surrounding the diver at " + myPosition + ":");
+		//logger.debug("Here's the danger surrounding the diver at " + myPosition + ":");
 		
 		//for (Direction d : directionDanger.keySet()){
 		//	if (d!= null)

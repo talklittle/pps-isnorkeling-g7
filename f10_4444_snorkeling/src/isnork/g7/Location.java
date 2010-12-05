@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 public class Location {
 	
 	private Point2D coordinate;
-	private int playerID = -1;
+	private int playerID = Integer.MAX_VALUE;
 	private Set<Observation> playerLocations;
 	
 	private Logger logger = Logger.getLogger(Location.class);
@@ -27,13 +27,15 @@ public class Location {
 	}
 	
 	public Point2D getLocation(){
-		if (playerID != -1){
-			logger.trace("Getting location from player " + playerID);
+		if (playerID != Integer.MAX_VALUE){
+			//logger.trace("Getting location from player " + playerID);
+			//System.out.println("Getting location from player " + playerID);
 			//TRAVERSE CURRENT PLAYER LOCATION LIST AND RETURN THAT LOCATION
 			return getPlayerLocation(playerID);
 		}
 		else{
-			logger.trace("Returning a static coordinate");
+
+			//logger.trace("Returning a static coordinate");
 			return coordinate;
 		}
 	}
@@ -43,7 +45,7 @@ public class Location {
 	}
 	
 	private Point2D getPlayerLocation(int playerID){
-		logger.debug("playerLocations: " + playerLocations);
+		//logger.debug("playerLocations: " + playerLocations);
 		
 		if(playerLocations!= null){
 			Iterator<Observation> playerIterator = playerLocations.iterator();

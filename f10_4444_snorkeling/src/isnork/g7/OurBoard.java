@@ -75,9 +75,9 @@ public class OurBoard {
 		
 		Point2D obsLocation = observation.getTheLocation().getLocation();
 		
-		logger.debug("observation:" + observation);
-		logger.debug("observation.getTheLocation():" + observation.getTheLocation());
-		logger.debug("observation.getTheLocation().getLocation():" + observation.getTheLocation().getLocation());
+		//logger.debug("observation:" + observation);
+		//logger.debug("observation.getTheLocation():" + observation.getTheLocation());
+		//logger.debug("observation.getTheLocation().getLocation():" + observation.getTheLocation().getLocation());
 		
 		if(obsLocation!=null){
 
