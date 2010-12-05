@@ -6,6 +6,7 @@ import isnork.sim.SeaLifePrototype;
 import java.awt.geom.Point2D;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Set;
@@ -17,7 +18,7 @@ public class TaskManager {
 	private HashMap<Task, Boolean> seenObjects; 
 	//Hash of the SeaLife creature name Strings mapping to the number of times it was seen
 	//by the diver using this class
-	private HashMap<String, Integer> seenCreatures;
+	private HashMap<String, HashSet<Integer>> seenCreatures;
 	private OurBoard ourBoard;
 	private Set<SeaLifePrototype> seaLifePossibilities;
 	private Set<Observation> playerLocations;
@@ -28,10 +29,10 @@ public class TaskManager {
 		this.seaLifePossibilities = seaLifePossibilities;
 		this.ourBoard = ourBoard;
 		
-		seenCreatures = new HashMap<String, Integer>();
+		seenCreatures = new HashMap<String, HashSet<Integer>>();
 		
 		for(SeaLifePrototype s: seaLifePossibilities){
-			seenCreatures.put(s.getName(), 0);
+			seenCreatures.put(s.getName(), new HashSet<Integer>());
 		}
 	}
 	
@@ -55,10 +56,10 @@ public class TaskManager {
 		taskList.add(task);
 		seenObjects.put(task, false);
 		
-		int numPreviousSightings = seenCreatures.get(creatureName).intValue();
+		int numPreviousSightings = seenCreatures.get(creatureName).size();
 	
 		task.discountPriorityScore((1.0/(1+numPreviousSightings)));
-		seenCreatures.put(creatureName, new Integer(numPreviousSightings++));
+		seenCreatures.get(creatureName).add(new Integer(numPreviousSightings++));
 	}
 	
 	/*To add tasks with static creature and fixed position associated*/
@@ -68,9 +69,8 @@ public class TaskManager {
 		taskList.add(task);
 		seenObjects.put(task, false);
 		
-		int numPreviousSightings = seenCreatures.get(creatureName).intValue();
+		int numPreviousSightings = seenCreatures.get(creatureName).size();
 		task.discountPriorityScore((1.0/(1+numPreviousSightings)));
-		seenCreatures.put(creatureName, new Integer(numPreviousSightings++));
 	}
 	
 	
@@ -115,12 +115,14 @@ public class TaskManager {
 	
 	public void markTaskComplete(Task task){
 		task.getObservation().setInvalid();
-		markCreatureSeen(task.getObservation().getCreatureName());
+		markCreatureSeen(task.getObservation().getCreatureName(), task.getObservation().getId());
 	}
 	
-	private void markCreatureSeen(String creatureName){
-		int numCreatureSightings = seenCreatures.get(creatureName).intValue();
-		seenCreatures.put(creatureName, new Integer(numCreatureSightings++));
+	private void markCreatureSeen(String creatureName, int id){
+		if (!seenCreatures.containsKey(creatureName)) {
+			seenCreatures.put(creatureName, new HashSet<Integer>());
+		}
+		seenCreatures.get(creatureName).add(id);
 	}
 	
 	private void updatePriorityScores(Point2D myCurrentLocation){
