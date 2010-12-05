@@ -252,7 +252,7 @@ public class BPConsultant extends Player {
 		this.round = 0;
 		this.boatTimeBufferAdjusted = NavigateToBoat.getBoatTimeBufferAdjusted(BOAT_TIME_BUFFER, seaLifePossibilities, d);
 		this.ourBoard = new OurBoard(d);
-		this.dangerFinder = new DangerFinder(ourBoard, seaLifePossibilities, random);
+		this.dangerFinder = new DangerFinder(ourBoard, d, r, seaLifePossibilities, random);
 		
 		taskManager = new TaskManager(seaLifePossibilities, ourBoard);
 		MessageTranslator.initializeMap(seaLifePossibilities);

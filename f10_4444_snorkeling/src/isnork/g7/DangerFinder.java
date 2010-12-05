@@ -8,6 +8,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -19,11 +20,14 @@ public class DangerFinder {
 	private HashMap<Direction, Double> directionDanger;
 	private static final double DANGER_MULTIPLIER = 2;
 	private static final double DANGER_MAX_DISTANCE = 5.0;
+	private static final double WALL_MAX_DISTANCE = 5.0;
 	private static final double STATIONARY_DANGER_DISTANCE = 1.5;
 	private Point2D myPosition;
 	private Point2D myPreviousPosition;
 	private Set<Observation> whatYouSee;
 	private OurBoard ourBoard;
+	private int d;
+	private int r;
 	private Set<SeaLifePrototype> seaLifePossibilities;
 	private Direction mySafestDirection;
 	private Random random;
@@ -33,8 +37,10 @@ public class DangerFinder {
 	Logger logger = Logger.getLogger(DangerFinder.class);
 	
 
-	public DangerFinder(OurBoard ourBoard, Set<SeaLifePrototype> seaLifePossibilities, Random random){
+	public DangerFinder(OurBoard ourBoard, int d, int r, Set<SeaLifePrototype> seaLifePossibilities, Random random){
 		this.ourBoard = ourBoard;
+		this.d = d;
+		this.r = r;
 		this.seaLifePossibilities = seaLifePossibilities;
 		this.directionDanger = new HashMap<Direction, Double>();
 		this.random = random;
@@ -49,8 +55,7 @@ public class DangerFinder {
 			if (!o.isDangerous())
 				continue;
 			
-			// 9 locations (predicted actual location + surrounding cells)
-			ArrayList<Point2D> predictedLocations = new ArrayList<Point2D>();
+			Point2D predictedLocation;
 			
 			int speed = 0;
 			int happy = 0;  // can't use o.happiness() because that is 0 when you are on boat!
@@ -65,7 +70,7 @@ public class DangerFinder {
 			// Get the location and distance based on predicted location
 			// (taking into account whether creature is stationary or moving).
 			if (speed == 0 || o.getDirection() == null) {
-				predictedLocations.add(o.getLocation());
+				predictedLocation = o.getLocation();
 			} else {
 				// predict where it will be
 				Point2D loc = new Point2D.Double(
@@ -75,49 +80,47 @@ public class DangerFinder {
 						o.getLocation().getY() + (o.getDirection().getDy())
 						);
 				if (ourBoard.inBounds((int)loc.getX(), (int)loc.getY())) {
-					predictedLocations.add(loc);
+					predictedLocation = loc;
 				} else {
-					predictedLocations.add(o.getLocation());
+					predictedLocation = o.getLocation();
 				}
 			}
 			
-			// Consider the Directions surrounding the creature
+			// For each Direction that diver can move, calculate the sum of danger from all creatures affecting it.
+			// The danger is scaled based on distance (decreases by a factor of radius).
 			for (Direction d : Direction.values()) {
-				Point2D loc = new Point2D.Double(
-						predictedLocations.get(0).getX() + d.getDx(),
-						predictedLocations.get(0).getY() + d.getDy());
-			//	logger.trace("predictedLocations.add("+loc+")");
-				predictedLocations.add(loc);
-			}
-			
-			// Calculate the danger for each direction
-			for (int i = 0; i < predictedLocations.size(); i++) {
 				
-				if (!ourBoard.inBounds((int)predictedLocations.get(i).getX(), (int)predictedLocations.get(i).getY()))
+				Point2D nextPosition = new Point2D.Double(
+						myPosition.getX() + d.getDx(),
+						myPosition.getY() + d.getDy());
+				
+				if (!ourBoard.inBounds((int)nextPosition.getX(), (int)nextPosition.getY()))
 					continue;
 				
-				Direction directionToCreature = ourBoard.getDirectionTowards(myPosition, predictedLocations.get(i));
-				double distanceToCreature = myPosition.distance(predictedLocations.get(i));
+				double distanceToCreature = nextPosition.distance(o.getLocation());
 				
 				//logger.debug("Direction:"+directionToCreature+" distanceToCreature = " + distanceToCreature);
 
 				// Only consider dangerous creatures if:
-				// 1. They are stationary and affect cells next to the diver, OR
-				// 2. They are moving and affect cells within DANGER_MAX_DISTANCE of the diver.
+				// 1. They are stationary and affect cells next to the candidate cell, OR
+				// 2. They are moving and affect cells within DANGER_MAX_DISTANCE of the candidate cell.
 				if (o.isDangerous() && ((speed == 0 && distanceToCreature <= STATIONARY_DANGER_DISTANCE)
 						|| (speed > 0 && distanceToCreature <= DANGER_MAX_DISTANCE))) {
 					
 					double formerDirectionDanger = 0;
 					
-					if (directionDanger.containsKey(directionToCreature)) {
-						formerDirectionDanger = directionDanger.get(directionToCreature);
+					if (directionDanger.containsKey(d)) {
+						formerDirectionDanger = directionDanger.get(d);
 						//logger.debug("formerDirectionDanger = " + formerDirectionDanger);
 					}
 						
-					directionDanger.put(directionToCreature, new Double(formerDirectionDanger + Math.abs(happy*DANGER_MULTIPLIER)));
+					directionDanger.put(d, new Double(formerDirectionDanger +
+							(Math.abs(happy*DANGER_MULTIPLIER) / distanceToCreature)));
 						
 				}
+				
 			}
+			
 		}
 	}
 	
@@ -151,11 +154,11 @@ public class DangerFinder {
 		
 		//logger.debug("in find safest direction");
 		double minDanger = Integer.MAX_VALUE;
-		double maxDanger = 0;
 		
 		ArrayList<DirectionAndDanger> directionsSafeToDangerous = new ArrayList<DirectionAndDanger>();
 		ArrayList<Direction> safestDirections = new ArrayList<Direction>();
 		
+		// First, find the minimum danger. Create an equivalence class of directions sharing this value.
 		for (Direction d : Direction.values()){
 			double curDanger;
 			if (directionDanger.containsKey(d)) {
@@ -163,6 +166,14 @@ public class DangerFinder {
 				//logger.trace("directionDanger.get("+d+") = "+curDanger);
 			} else {
 				curDanger = 0;
+			}
+			
+			Point2D nextPosition = new Point2D.Double(
+					myPosition.getX() + d.getDx(),
+					myPosition.getY() + d.getDy());
+			// Do not consider directions that take us too close to the walls
+			if (ourBoard.isNearBoundary(nextPosition, Math.max(WALL_MAX_DISTANCE, r))) {
+				continue;
 			}
 			
 //			logger.debug("current danger in direction " + d + ":" + curDanger);
@@ -193,7 +204,7 @@ public class DangerFinder {
 			} else {
 				// Prioritize the directions closer to the safest
 				// And de-prioritize the previous location
-				Direction previousDirection = ourBoard.getDirectionTowards(myPosition, myPreviousPosition);
+				Direction previousDirection = OurBoard.getDirectionTowards(myPosition, myPreviousPosition);
 				for (Direction d : DirectionUtil.getClosestDirections(preferredDirection)) {
 					if (safestDirections.contains(d) && !d.equals(previousDirection)) {
 						mySafestDirection = d;
@@ -207,15 +218,35 @@ public class DangerFinder {
 			}
 		} else {
 			// 80% of the time, continue in preferredDirection if it is among the safest
-			if (preferredDirection != null && safestDirections.contains(preferredDirection) && random.nextDouble() >= 0.80) {
+			if (preferredDirection != null && safestDirections.contains(preferredDirection) && random.nextDouble() < 0.80) {
 				mySafestDirection = preferredDirection;
 			} else {
-				Collections.shuffle(safestDirections);
-				mySafestDirection = safestDirections.get(0);
+				List<Direction> closestDirections = DirectionUtil.getClosestDirections(preferredDirection);
+				// Try to pick the safest direction out of [forward-left, forward-right, left, right]
+				List<Direction> firstTwo = closestDirections.subList(0, 2);
+				List<Direction> nextTwo = closestDirections.subList(2, 4);
+				// Look at the top 3 safest directions
+				for (DirectionAndDanger dad : directionsSafeToDangerous.subList(0, 3)) {
+					// skip the one going backwards
+					if (dad.equals(OurBoard.getDirectionTowards(myPosition, myPreviousPosition))) {
+						continue;
+					}
+					if (firstTwo.contains(dad.getDirection())) {
+						mySafestDirection = dad.getDirection();
+						break;
+					}
+					else if (nextTwo.contains(dad.getDirection())) {
+						mySafestDirection = dad.getDirection();
+						break;
+					}
+				}
+				if (mySafestDirection == null) {
+					Collections.shuffle(safestDirections);
+					mySafestDirection = safestDirections.get(0);
+				}
 			}
 		}
 		//logger.debug("Safest direction: " + mySafestDirection + " (from among " + safestDirections.toString() + ")");
 		return mySafestDirection;
 	}
-
 }

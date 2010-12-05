@@ -19,6 +19,9 @@ public class OurBoard {
 	/*Returns the direction between to points*/
 	public static Direction getDirectionTowards(Point2D from, Point2D to){
 		
+		if (from == null || to == null)
+			return null;
+		
 		if (from.getX() < to.getX() && from.getY() > to.getY()){
 			return Direction.NE;
 		}
@@ -94,5 +97,13 @@ public class OurBoard {
 	
 	public boolean inBounds(int x, int y) {
 		return Math.abs(x) <= d && Math.abs(y) <= d;
+	}
+	
+	public boolean isNearBoundary(Point2D location, double nearDistance) {
+		return location.distance(location.getX(), d) < nearDistance
+			|| location.distance(location.getX(), -d) < nearDistance
+			|| location.distance(d, location.getY()) < nearDistance
+			|| location.distance(-d, location.getY()) < nearDistance;
+		
 	}
 }
