@@ -55,6 +55,10 @@ public class BPConsultant extends Player {
 	private SeaLifePrototype toTrack = null;
 	private Point2D trackLocal = null;
 	private Task task = null;
+	private Direction radiateOut = null;
+	private Set<Observation> pLocations = null;
+
+	private Tracker ourTracker;;
 	
 	@Override
 	public String getName() {
@@ -68,6 +72,8 @@ public class BPConsultant extends Player {
 		this.myPosition = myPosition;
 		this.whatYouSee = whatYouSee;
 		taskManager.updatePlayerLocations(playerLocations);
+		pLocations = playerLocations;
+		ourTracker.updatePoints(playerLocations, myPosition);
 		
 		Observation[] a = new Observation[whatYouSee.size()];
 		ArrayList<OurObservation> o = new ArrayList<OurObservation>();
@@ -157,8 +163,6 @@ public class BPConsultant extends Player {
 			//add stuff to queue
 		}
 		
-		//logger.debug("snorkMessage: " + snorkMessage);
-		
 		return snorkMessage;
 	}
 	
@@ -220,10 +224,23 @@ public class BPConsultant extends Player {
 				if(curTracking)
 				{
 					//logger.debug(myPosition + " " + trackLocal);
-					return Tracker.track(toTrack, myPosition, trackLocal);
+					Direction dt =  Tracker.track(myPosition, trackLocal);
+					return dangerFinder.findSafestDirection(myPosition, myPreviousPosition, whatYouSee, dt, false);
 				}
 				//else rando-walk
 				//return Tracker.track(null, myPosition, beast);
+				
+				if(radiateOut != null)
+				{
+					if(Math.abs(myPosition.getX())+r >= Math.abs(d/2) || Math.abs(myPosition.getY())+r >= Math.abs(d/2))
+						radiateOut = null;
+					return dangerFinder.findSafestDirection(myPosition, myPreviousPosition, whatYouSee, radiateOut, false);
+				}
+				else
+				{
+					Direction dest = ourTracker.getClosestUnexplored(myPosition);
+					return dangerFinder.findSafestDirection(myPosition, myPreviousPosition, whatYouSee, dest, false);
+				}
 			}
 			else
 			{
@@ -241,12 +258,28 @@ public class BPConsultant extends Player {
 						if(myPosition.distance(task.getObservation().getTheLocation().getLocation()) < 5)
 							task =null;
 						else
-							direction = Tracker.track(null, myPosition, task.getObservation().getTheLocation().getLocation());
+						{
+							direction = Tracker.track(myPosition, task.getObservation().getTheLocation().getLocation());
+							return dangerFinder.findSafestDirection(myPosition, myPreviousPosition, whatYouSee, direction, false);
+						}
 					}
 				}
 				//else rando walk
+				if(radiateOut != null)
+				{
+					logger.debug("Doing rando walk");
+					if(Math.abs(myPosition.getX())+r >= Math.abs(d/2) || Math.abs(myPosition.getY())+r >= Math.abs(d/2))
+						radiateOut = null;
+					return dangerFinder.findSafestDirection(myPosition, myPreviousPosition, whatYouSee, radiateOut, false);
+				}
+				else
+				{
+					Direction dest = ourTracker.getClosestUnexplored(myPosition);
+					return dangerFinder.findSafestDirection(myPosition, myPreviousPosition, whatYouSee, dest, false);
+				}
+				
 			}
-			
+			/*
 			Direction d = dangerFinder.findSafestDirection(myPosition, myPreviousPosition,
 					whatYouSee, direction, false);
 			
@@ -266,6 +299,7 @@ public class BPConsultant extends Player {
 				}
 			}
 			return d;
+			*/
 		}
 	}
 	
@@ -281,9 +315,10 @@ public class BPConsultant extends Player {
 		this.boatTimeBufferAdjusted = NavigateToBoat.getBoatTimeBufferAdjusted(BOAT_TIME_BUFFER, seaLifePossibilities, d);
 		this.ourBoard = new OurBoard(d);
 		this.dangerFinder = new DangerFinder(ourBoard, d, r, seaLifePossibilities, random);
-		
+		this.radiateOut = Tracker.getRandomDirection();
 		taskManager = new TaskManager(seaLifePossibilities, ourBoard);
 		MessageTranslator.initializeMap(seaLifePossibilities);
+		this.ourTracker = new Tracker(d,r);
 		
 		if(Math.random() >= 0.5)
 			isTracker = true;
