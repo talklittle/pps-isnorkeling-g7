@@ -97,7 +97,7 @@ public class BPConsultant extends Player {
 			//if tracking, return highest static creature
 			if(curTracking)
 			{
-				logger.debug("Diver " + " is following " + toTrack.getName());
+				//logger.debug("Diver " + " is following " + toTrack.getName());
 				
 				//update trackLocal
 				boolean change = false;
@@ -117,7 +117,7 @@ public class BPConsultant extends Player {
 					snorkMessage = MessageTranslator.getMessage(ob.o.getName());
 					if(MessageTranslator.hm.get(snorkMessage).getSpeed() == 0)
 					{
-						logger.debug("tracker sees: " +snorkMessage);
+						//logger.debug("tracker sees: " +snorkMessage);
 						return snorkMessage;
 					}
 				}
@@ -267,7 +267,7 @@ public class BPConsultant extends Player {
 				//else rando walk
 				if(radiateOut != null)
 				{
-					logger.debug("Doing rando walk");
+					//logger.debug("Doing rando walk");
 					if(Math.abs(myPosition.getX())+r >= Math.abs(d/2) || Math.abs(myPosition.getY())+r >= Math.abs(d/2))
 						radiateOut = null;
 					return dangerFinder.findSafestDirection(myPosition, myPreviousPosition, whatYouSee, radiateOut, false);
