@@ -17,11 +17,12 @@ import org.apache.log4j.Logger;
 
 public class DangerFinder {
 	
+	static final double DANGER_MULTIPLIER = 2.0;
+	static final double DANGER_MAX_DISTANCE = 5.0;
+	static final double WALL_MAX_DISTANCE = 5.0;
+	static final double STATIONARY_DANGER_DISTANCE = 1.5;
+	
 	private HashMap<Direction, Double> directionDanger;
-	private static final double DANGER_MULTIPLIER = 2;
-	private static final double DANGER_MAX_DISTANCE = 5.0;
-	private static final double WALL_MAX_DISTANCE = 5.0;
-	private static final double STATIONARY_DANGER_DISTANCE = 1.5;
 	private Point2D myPosition;
 	private Point2D myPreviousPosition;
 	private Set<Observation> whatYouSee;
@@ -213,8 +214,14 @@ public class DangerFinder {
 				}
 				// We excluded previous direction in above loop.
 				// If mySafestDirection == null, that means safest is previous direction.
-				if (mySafestDirection == null)
-					mySafestDirection = directionsSafeToDangerous.get(0).getDirection();
+				if (mySafestDirection == null) {
+					if (!directionsSafeToDangerous.isEmpty()) {
+						mySafestDirection = directionsSafeToDangerous.get(0).getDirection();
+					} else {
+						// just go back towards boat...
+						mySafestDirection = OurBoard.getDirectionTowards(myPosition, new Point2D.Double(0,0));
+					}
+				}
 			}
 		} else {
 			// 80% of the time, continue in preferredDirection if it is among the safest
@@ -226,23 +233,30 @@ public class DangerFinder {
 				List<Direction> firstTwo = closestDirections.subList(0, 2);
 				List<Direction> nextTwo = closestDirections.subList(2, 4);
 				// Look at the top 3 safest directions
-				for (DirectionAndDanger dad : directionsSafeToDangerous.subList(0, 3)) {
-					// skip the one going backwards
-					if (dad.equals(OurBoard.getDirectionTowards(myPosition, myPreviousPosition))) {
-						continue;
-					}
-					if (firstTwo.contains(dad.getDirection())) {
-						mySafestDirection = dad.getDirection();
-						break;
-					}
-					else if (nextTwo.contains(dad.getDirection())) {
-						mySafestDirection = dad.getDirection();
-						break;
+				if (directionsSafeToDangerous.size() >= 3) {
+					for (DirectionAndDanger dad : directionsSafeToDangerous.subList(0, 3)) {
+						// skip the one going backwards
+						if (dad.equals(OurBoard.getDirectionTowards(myPosition, myPreviousPosition))) {
+							continue;
+						}
+						if (firstTwo.contains(dad.getDirection())) {
+							mySafestDirection = dad.getDirection();
+							break;
+						}
+						else if (nextTwo.contains(dad.getDirection())) {
+							mySafestDirection = dad.getDirection();
+							break;
+						}
 					}
 				}
 				if (mySafestDirection == null) {
-					Collections.shuffle(safestDirections);
-					mySafestDirection = safestDirections.get(0);
+					if (!safestDirections.isEmpty()) {
+						Collections.shuffle(safestDirections);
+						mySafestDirection = safestDirections.get(0);
+					} else {
+						// no safe directions?? return to boat then...
+						mySafestDirection = OurBoard.getDirectionTowards(myPosition, new Point2D.Double(0,0));
+					}
 				}
 			}
 		}

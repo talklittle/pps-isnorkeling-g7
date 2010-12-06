@@ -55,11 +55,6 @@ public class TaskManager {
 		Task task = new Task(creatureName, playerID, ourBoard, seaLifePossibilities, playerLocations);
 		taskList.add(task);
 		seenObjects.put(task, false);
-		
-		int numPreviousSightings = seenCreatures.get(creatureName).size();
-	
-		task.discountPriorityScore((1.0/(1+numPreviousSightings)));
-		seenCreatures.get(creatureName).add(new Integer(numPreviousSightings++));
 	}
 	
 	/*To add tasks with static creature and fixed position associated*/
@@ -68,9 +63,6 @@ public class TaskManager {
 		//task.getObservation().setLocation(coordinate);
 		taskList.add(task);
 		seenObjects.put(task, false);
-		
-		int numPreviousSightings = seenCreatures.get(creatureName).size();
-		task.discountPriorityScore((1.0/(1+numPreviousSightings)));
 	}
 	
 	
@@ -95,7 +87,7 @@ public class TaskManager {
 			}
 			
 			if(nextTask != null){
-				markTaskComplete(nextTask);
+//				markTaskComplete(nextTask);
 				return nextTask;
 			}
 		}
@@ -133,7 +125,7 @@ public class TaskManager {
 		
 		while (hasNextTask){
 			nextTask = taskIterator.next();
-			nextTask.updatePriorityScore(myCurrentLocation);
+			nextTask.updatePriorityScore(myCurrentLocation, seenCreatures);
 			hasNextTask = taskIterator.hasNext();
 		}
 	}
