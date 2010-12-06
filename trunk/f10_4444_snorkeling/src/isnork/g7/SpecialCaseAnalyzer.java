@@ -1,8 +1,7 @@
 package isnork.g7;
 
-import isnork.sim.Observation;
+import isnork.sim.SeaLifePrototype;
 
-import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -16,16 +15,14 @@ public class SpecialCaseAnalyzer {
 
 	private static final Logger logger = Logger.getLogger(SpecialCaseAnalyzer.class);
 	
-	public String detectDangerousMap(Set<Observation> seaLifePossibilities){
-		Iterator<Observation> seaLifePossibilitiesIt = seaLifePossibilities.iterator();
-		
+	public String detectDangerousMap(Set<SeaLifePrototype> seaLifePossibilities){
 		int boardDangerTotal = 0;
 		
-		while(seaLifePossibilitiesIt.hasNext()){
-			Observation nextSeaLife = seaLifePossibilitiesIt.next();
+		for (SeaLifePrototype life : seaLifePossibilities) {
+			int avgCount = (int) Math.ceil(( life.getMinCount() + life.getMaxCount() ) / 2.0);
 			
-			if (nextSeaLife.isDangerous()){
-				boardDangerTotal += (nextSeaLife.happiness()*2);
+			if (life.isDangerous()){
+				boardDangerTotal += avgCount * (life.getHappiness()*2);
 			}
 		}
 		
