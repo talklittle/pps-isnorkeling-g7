@@ -200,7 +200,9 @@ public class DangerFinder {
 		mySafestDirection = null;
 		if (shouldReturnToBoat) {
 			// If returning to boat, always head in preferredDirection if it is among the safest
-			if (preferredDirection != null && safestDirections.contains(preferredDirection)) {
+			if (preferredDirection == null) {
+				mySafestDirection = null;
+			} else if (safestDirections.contains(preferredDirection)) {
 				mySafestDirection = preferredDirection;
 			} else {
 				// Prioritize the directions closer to the safest

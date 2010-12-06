@@ -208,8 +208,8 @@ public class BPConsultant extends Player {
 			// If there are at least 6 spare minutes, that lets you maneuver around dangerous creatures,
 			// even going diagonally away from boat once.
 			else {
-				//logger.debug("Returning to boat but trying to avoid danger still")
-;				Direction preferredDirectionToBoat = NavigateToBoat.getShortestDirectionToBoat(whereIAm);
+				//logger.debug("Returning to boat but trying to avoid danger still");
+				Direction preferredDirectionToBoat = NavigateToBoat.getShortestDirectionToBoat(whereIAm);
 				direction = dangerFinder.findSafestDirection(myPosition, myPreviousPosition,
 						whatYouSee, preferredDirectionToBoat, true);
 			}
