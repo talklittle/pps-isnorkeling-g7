@@ -225,7 +225,9 @@ public class DangerFinder {
 			}
 		} else {
 			// 80% of the time, continue in preferredDirection if it is among the safest
-			if (preferredDirection != null && safestDirections.contains(preferredDirection) && random.nextDouble() < 0.80) {
+
+			if (preferredDirection != null && safestDirections.contains(preferredDirection) && random.nextDouble() <= 0.80) {
+
 				mySafestDirection = preferredDirection;
 			} else {
 				List<Direction> closestDirections = DirectionUtil.getClosestDirections(preferredDirection);
