@@ -4,6 +4,8 @@ import isnork.sim.Observation;
 import isnork.sim.SeaLifePrototype;
 
 import java.awt.geom.Point2D;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 public class Task implements Comparable<Task> {
@@ -26,8 +28,23 @@ public class Task implements Comparable<Task> {
 
 	}
 	
-	public void updatePriorityScore(Point2D myCurrentLocation){
-		priorityScore = observation.happiness() / ourBoard.findDistanceToObservation(observation, myCurrentLocation);
+	public void updatePriorityScore(Point2D myCurrentLocation, HashMap<String, HashSet<Integer>> seenCreatures){
+		String creatureName = observation.getCreatureName();
+		int timesSeen = seenCreatures.get(creatureName).size();
+		SeaLifePrototype life = getCreature(creatureName);
+		double happiness = life.getHappinessD();
+		boolean isDangerous = life.isDangerous();
+		if (timesSeen == 0) {
+			priorityScore = happiness / ourBoard.findDistanceToObservation(observation, myCurrentLocation);
+		} else if (timesSeen == 1) {
+			priorityScore = happiness / 2.0 / ourBoard.findDistanceToObservation(observation, myCurrentLocation);
+		} else if (timesSeen == 2) {
+			priorityScore = happiness / 4.0 / ourBoard.findDistanceToObservation(observation, myCurrentLocation);
+		} else if (isDangerous) {
+			priorityScore = -happiness * DangerFinder.DANGER_MULTIPLIER / ourBoard.findDistanceToObservation(observation, myCurrentLocation);
+		} else {
+			priorityScore = 0;
+		}
 	}
 
 	public double getPriorityScore(){
@@ -38,8 +55,8 @@ public class Task implements Comparable<Task> {
 		return observation;
 	}
 	
-	public void discountPriorityScore(double discount){
-		priorityScore *= (1-discount);
+	public void setPriorityScore(double newScore){
+		priorityScore = newScore;
 	}
 
 	@Override
