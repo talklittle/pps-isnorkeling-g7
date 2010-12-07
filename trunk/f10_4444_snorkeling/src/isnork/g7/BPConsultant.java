@@ -128,7 +128,9 @@ public class BPConsultant extends Player {
 			for(OurObservation ob: o)
 			{
 				snorkMessage = MessageTranslator.getMessage(ob.o.getName());
-				if(MessageTranslator.hm.get(snorkMessage).getSpeed() > 0)
+				if(MessageTranslator.hm.get(snorkMessage).getSpeed() > 0 
+						|| !taskManager.seenCreatures.containsKey(ob.o.getName()) 
+						|| !taskManager.chasedCreatures.containsKey(ob.o.getName()))
 				{
 				//	logger.debug("tracking: " +snorkMessage);
 					curTracking = true;
@@ -255,7 +257,8 @@ public class BPConsultant extends Player {
 					Point2D objCoord = task.getObservation().getTheLocation().getLocation();
 					
 					if (objCoord!=null){
-						if(myPosition.distance(task.getObservation().getTheLocation().getLocation()) < 5)
+						//if(myPosition.distance(task.getObservation().getTheLocation().getLocation()) < 5)
+						if(task.doISeeTheTarget(whatYouSee))
 							task =null;
 						else
 						{
