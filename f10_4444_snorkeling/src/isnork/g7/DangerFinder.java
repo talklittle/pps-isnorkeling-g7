@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
 public class DangerFinder {
 	
 	static final double DANGER_MULTIPLIER = 2.0;
-	static final double DANGER_MAX_DISTANCE = 5.0;
+	static final double DANGER_MAX_DISTANCE = 6.0;
 	static final double WALL_MAX_DISTANCE = 5.0;
 	static final double STATIONARY_DANGER_DISTANCE = 1.5;
 	
