@@ -57,6 +57,8 @@ public class BPConsultant extends Player {
 	private Task task = null;
 	private Direction radiateOut = null;
 	private Set<Observation> pLocations = null;
+	private SpecialCaseAnalyzer specialCaseAnalyzer = null;  // detect Piranha etc. maps
+	private String specialCase = "";
 
 	private Tracker ourTracker;;
 	
@@ -194,9 +196,16 @@ public class BPConsultant extends Player {
 		return 0;
 	}
 
-		
+	
 	@Override
 	public Direction getMove() {	
+		
+		// handle dangerous maps like Piranha
+		if (SpecialCaseAnalyzer.HIGH_DANGER_STRING.equals(specialCase)) {
+			return getDangerousMapMove();
+		}
+		
+		
 		// Head back to boat if we are running low on time (shortest time back, plus a buffer)
 //		if (getRemainingTime() <= NavigateToBoat.getTimeToBoat(whereIAm) + boatTimeBufferAdjusted || shouldReturnToBoat) {
 		if (getRemainingTime() <= 180) {
@@ -306,6 +315,39 @@ public class BPConsultant extends Player {
 		}
 	}
 	
+	// For very dangerous maps (Piranha) use a single-chain DFA
+	private static final int DANGEROUS_MAP_STATE_ONBOAT = 0;
+	private static final int DANGEROUS_MAP_STATE_OFFBOAT = 1;
+	private static final int DANGEROUS_MAP_STATE_ENDBOAT = 2;
+	private int dangerousMapState = DANGEROUS_MAP_STATE_ONBOAT;
+		
+	private Direction getDangerousMapMove() {
+		switch (dangerousMapState) {
+		case DANGEROUS_MAP_STATE_ONBOAT:
+			if (getRemainingTime() >= 6) {
+				// wait for opening to leave boat quickly
+				Direction direction = dangerFinder.findSafestDirection(myPosition, myPreviousPosition,
+						whatYouSee, getNewDirection(), false);
+				if (dangerFinder.getDangerInDirection(direction) == 0.0) {
+					dangerousMapState = DANGEROUS_MAP_STATE_OFFBOAT;
+					return direction;
+				}
+			}
+			return null;
+		case DANGEROUS_MAP_STATE_OFFBOAT:
+			// wait until you see something or get scared, then get back on
+			if (this.getHappiness() != 0 || getRemainingTime() <= 3) {
+				dangerousMapState = DANGEROUS_MAP_STATE_ENDBOAT;
+				return NavigateToBoat.getShortestDirectionToBoat(myPosition);
+			}
+			return null;
+		case DANGEROUS_MAP_STATE_ENDBOAT:
+			return null;
+		default:
+			return null;
+		}
+	}
+	
 	@Override
 	public void newGame(Set<SeaLifePrototype> seaLifePossibilities, int penalty,
 			int d, int r, int n) {
@@ -322,6 +364,10 @@ public class BPConsultant extends Player {
 		taskManager = new TaskManager(seaLifePossibilities, ourBoard);
 		MessageTranslator.initializeMap(seaLifePossibilities);
 		this.ourTracker = new Tracker(d,r);
+		
+		this.specialCaseAnalyzer = new SpecialCaseAnalyzer();
+		this.specialCase = specialCaseAnalyzer.detectDangerousMap(seaLifePossibilities);
+		logger.debug("special case: " + this.specialCase);
 		
 		if(Math.random() >= 0.5)
 			isTracker = true;

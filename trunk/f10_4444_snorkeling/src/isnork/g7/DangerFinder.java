@@ -291,4 +291,11 @@ public class DangerFinder {
 		//logger.debug("Safest direction: " + mySafestDirection + " (from among " + safestDirections.toString() + ")");
 		return mySafestDirection;
 	}
+	
+	public Double getDangerInDirection(Direction direction) {
+		if (directionDanger.containsKey(direction))
+			return directionDanger.get(direction);
+		else
+			return 0.0;
+	}
 }
