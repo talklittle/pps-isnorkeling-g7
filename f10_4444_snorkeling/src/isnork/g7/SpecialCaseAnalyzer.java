@@ -9,6 +9,11 @@ import org.apache.log4j.Logger;
 
 public class SpecialCaseAnalyzer {
 	
+	public static final String HIGH_DANGER_STRING = "Extreme danger";
+	public static final String MED_DANGER_STRING = "Medium danger";
+	public static final String LOW_DANGER_STRING = "Low danger";
+	public static final String VERY_LOW_DANGER_STRING = "Very low danger";
+	
 	private static final int HIGH_DANGER_THRESHOLD = 9000;
 	private static final int MED_DANGER_THRESHOLD = 2000;
 	private static final int LOW_DANGER_THRESHOLD = 500;
@@ -27,16 +32,16 @@ public class SpecialCaseAnalyzer {
 		}
 		
 		if (boardDangerTotal > HIGH_DANGER_THRESHOLD){
-			return "Extreme danger";
+			return HIGH_DANGER_STRING;
 		}
 		else if (boardDangerTotal > MED_DANGER_THRESHOLD){
-			return "Medium danger";
+			return MED_DANGER_STRING;
 		}
 		else if (boardDangerTotal > LOW_DANGER_THRESHOLD){
-			return "Low danger";
+			return LOW_DANGER_STRING;
 		}
 		else{
-			return "Very low danger";
+			return VERY_LOW_DANGER_STRING;
 		}
 	}
 	
