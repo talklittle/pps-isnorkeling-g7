@@ -101,7 +101,7 @@ public class DangerFinder {
 				if (!ourBoard.inBounds((int)nextPosition.getX(), (int)nextPosition.getY()))
 					continue;
 				
-				double distanceToCreature = Math.max(1.0, nextPosition.distance(o.getLocation()));
+				double distanceToCreature = Math.max(1.0, nextPosition.distance(predictedLocation));
 				
 //				logger.debug("Direction:"+d+" distanceToCreature = " + distanceToCreature);
 
@@ -127,6 +127,19 @@ public class DangerFinder {
 			
 		}
 	}
+	
+	private boolean isMovingTowardsMe(Observation o) {
+		Point2D nextPosition = new Point2D.Double(
+				o.getLocation().getX() + o.getDirection().getDx(),
+				o.getLocation().getY() + o.getDirection().getDy());
+		if (ourBoard.inBounds((int)nextPosition.getX(), (int)nextPosition.getY())) {
+			return myPosition.distance(nextPosition) < myPosition.distance(o.getLocation());
+		}
+		// trying to move invalid; so it doesn't move; so not getting closer.
+		return false;
+	}
+	
+
 	
 	public void updateCoordinates(Point2D myPosition, Point2D myPreviousPosition, Set<Observation> whatYouSee){
 		this.myPosition = myPosition;
@@ -187,7 +200,7 @@ public class DangerFinder {
 			
 			// Do not consider directions that put us in backtracked locations
 			// i.e. we are trying to go around danger, so don't go backwards
-			if (backtrackLocations.contains(nextPosition)) {
+			if (shouldReturnToBoat && backtrackLocations.contains(nextPosition)) {
 				continue;
 			}
 			
