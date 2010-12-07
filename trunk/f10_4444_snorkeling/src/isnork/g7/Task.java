@@ -82,4 +82,16 @@ public class Task implements Comparable<Task> {
 		observation.getTheLocation().setPlayerLocations(playerLocations);
 	}
 	
+	public boolean doISeeTheTarget(Set<Observation> seaLifeCreatures){
+		String targetName = observation.getCreatureName();
+		
+		for(Observation o: seaLifeCreatures){
+			if (targetName.equals(o.getName())){
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 }
