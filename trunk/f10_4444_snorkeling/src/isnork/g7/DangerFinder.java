@@ -200,7 +200,7 @@ public class DangerFinder {
 			
 			// Do not consider directions that put us in backtracked locations
 			// i.e. we are trying to go around danger, so don't go backwards
-			if (shouldReturnToBoat && backtrackLocations.contains(nextPosition)) {
+			if (backtrackLocations.contains(nextPosition)) {
 				continue;
 			}
 			
