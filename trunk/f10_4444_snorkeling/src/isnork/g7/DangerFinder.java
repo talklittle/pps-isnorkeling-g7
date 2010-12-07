@@ -33,6 +33,8 @@ public class DangerFinder {
 	private Direction mySafestDirection;
 	private Random random;
 	
+	private ArrayList<Point2D> backtrackLocations;
+	
 	// TODO change time-to-get-home based on stats (number of dangerous creatures)
 	
 	Logger logger = Logger.getLogger(DangerFinder.class);
@@ -45,6 +47,7 @@ public class DangerFinder {
 		this.seaLifePossibilities = seaLifePossibilities;
 		this.directionDanger = new HashMap<Direction, Double>();
 		this.random = random;
+		this.backtrackLocations = new ArrayList<Point2D>();
 	}
 	
 	
@@ -98,9 +101,9 @@ public class DangerFinder {
 				if (!ourBoard.inBounds((int)nextPosition.getX(), (int)nextPosition.getY()))
 					continue;
 				
-				double distanceToCreature = nextPosition.distance(o.getLocation());
+				double distanceToCreature = Math.max(1.0, nextPosition.distance(o.getLocation()));
 				
-				//logger.debug("Direction:"+directionToCreature+" distanceToCreature = " + distanceToCreature);
+//				logger.debug("Direction:"+d+" distanceToCreature = " + distanceToCreature);
 
 				// Only consider dangerous creatures if:
 				// 1. They are stationary and affect cells next to the candidate cell, OR
@@ -116,7 +119,7 @@ public class DangerFinder {
 					}
 						
 					directionDanger.put(d, new Double(formerDirectionDanger +
-							(Math.abs(happy*DANGER_MULTIPLIER) / distanceToCreature)));
+							( Math.abs(happy*DANGER_MULTIPLIER) / Math.pow(distanceToCreature, 2) )));
 						
 				}
 				
@@ -153,6 +156,11 @@ public class DangerFinder {
 		updateCoordinates(myPosition, myPreviousPosition, whatYouSee);
 		findDanger();
 		
+		// if we are at boat, reset the tracked helper state
+		if (myPosition.equals(new Point2D.Double(0,0))) {
+			backtrackLocations.clear();
+		}
+		
 		//logger.debug("in find safest direction");
 		double minDanger = Integer.MAX_VALUE;
 		
@@ -174,6 +182,12 @@ public class DangerFinder {
 					myPosition.getY() + d.getDy());
 			// Do not consider directions that take us too close to the walls
 			if (ourBoard.isNearBoundary(nextPosition, Math.max(WALL_MAX_DISTANCE, r))) {
+				continue;
+			}
+			
+			// Do not consider directions that put us in backtracked locations
+			// i.e. we are trying to go around danger, so don't go backwards
+			if (backtrackLocations.contains(nextPosition)) {
 				continue;
 			}
 			
@@ -224,6 +238,9 @@ public class DangerFinder {
 						mySafestDirection = OurBoard.getDirectionTowards(myPosition, new Point2D.Double(0,0));
 					}
 				}
+				
+				// we did not pick preferredDirection, so next time make sure we don't come back
+				backtrackLocations.add(myPreviousPosition);
 			}
 		} else {
 			// 80% of the time, continue in preferredDirection if it is among the safest
@@ -262,8 +279,15 @@ public class DangerFinder {
 						mySafestDirection = OurBoard.getDirectionTowards(myPosition, new Point2D.Double(0,0));
 					}
 				}
+				
+				// we did not pick preferredDirection, so next time make sure we don't come back
+				backtrackLocations.add(myPreviousPosition);
 			}
 		}
+		
+		// if we end up going in preferredDirection, no need to avoid backtrack areas anymore
+		backtrackLocations.clear();
+		
 		//logger.debug("Safest direction: " + mySafestDirection + " (from among " + safestDirections.toString() + ")");
 		return mySafestDirection;
 	}
