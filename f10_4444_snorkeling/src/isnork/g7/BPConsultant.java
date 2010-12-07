@@ -59,6 +59,10 @@ public class BPConsultant extends Player {
 	private Set<Observation> pLocations = null;
 	private SpecialCaseAnalyzer specialCaseAnalyzer = null;  // detect Piranha etc. maps
 	private String specialCase = "";
+	
+	// keep track of maxDistance and timeToMaxDistance to estimate time to return to boat
+	private double maxDistance = 0.0;
+	private int timeToMaxDistance = 1;
 
 	private Tracker ourTracker;;
 	
@@ -92,7 +96,12 @@ public class BPConsultant extends Player {
 		String snorkMessage = null;
 		whereIAm = myPosition;
 		round++;
-		
+
+		if (whereIAm.distance(0, 0) > maxDistance) {
+			maxDistance = whereIAm.distance(0, 0);
+			timeToMaxDistance = round;
+		}
+
 		if(isTracker)
 		{
 			//look at all creatures
@@ -206,9 +215,11 @@ public class BPConsultant extends Player {
 		}
 		
 		
-		// Head back to boat if we are running low on time (shortest time back, plus a buffer)
-//		if (getRemainingTime() <= NavigateToBoat.getTimeToBoat(whereIAm) + boatTimeBufferAdjusted || shouldReturnToBoat) {
-		if (getRemainingTime() <= 180) {
+		// Head back to boat if we are running low on time, based on calculated avg speed
+		double avgSpeed = maxDistance / (double) timeToMaxDistance;
+		if (avgSpeed == 0)
+			avgSpeed = 0.3;
+		if (shouldReturnToBoat || (getRemainingTime() <= 6 + (whereIAm.distance(0,0) / avgSpeed))) {
 			shouldReturnToBoat = true;
 			//logger.debug("Returning to the boat.");
 			// If not enough time, ignore all dangerous creatures and return to boat.
