@@ -18,7 +18,8 @@ public class TaskManager {
 	private HashMap<Task, Boolean> seenObjects; 
 	//Hash of the SeaLife creature name Strings mapping to the number of times it was seen
 	//by the diver using this class
-	private HashMap<String, HashSet<Integer>> seenCreatures;
+	public HashMap<String, HashSet<Integer>> seenCreatures;
+	public HashMap<String, Integer> chasedCreatures;
 	private OurBoard ourBoard;
 	private Set<SeaLifePrototype> seaLifePossibilities;
 	private Set<Observation> playerLocations;
@@ -30,6 +31,7 @@ public class TaskManager {
 		this.ourBoard = ourBoard;
 		
 		seenCreatures = new HashMap<String, HashSet<Integer>>();
+		chasedCreatures = new HashMap<String, Integer>();
 		
 		for(SeaLifePrototype s: seaLifePossibilities){
 			seenCreatures.put(s.getName(), new HashSet<Integer>());
@@ -61,6 +63,7 @@ public class TaskManager {
 	public void addTask(String creatureName, Point2D coordinate){
 		Task task = new Task(creatureName, coordinate, ourBoard, seaLifePossibilities, playerLocations);
 		//task.getObservation().setLocation(coordinate);
+		chasedCreatures.put(creatureName,1);
 		taskList.add(task);
 		seenObjects.put(task, false);
 	}
