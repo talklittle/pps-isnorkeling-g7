@@ -25,7 +25,6 @@ public class Task implements Comparable<Task> {
 		observation = new OurObservation(creatureName, coordinate, seaLifePossibilities, playerLocations);
 		this.ourBoard = ourBoard; 
 		this.seaLifePossibilities = seaLifePossibilities;
-
 	}
 	
 	public void updatePriorityScore(Point2D myCurrentLocation, HashMap<String, HashSet<Integer>> seenCreatures){
@@ -92,6 +91,11 @@ public class Task implements Comparable<Task> {
 		}
 		
 		return false;
+	}
+	
+	public String toString(){
+		
+		return observation.getCreatureName();
 	}
 	
 }

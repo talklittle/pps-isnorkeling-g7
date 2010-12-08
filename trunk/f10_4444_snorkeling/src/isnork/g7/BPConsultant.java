@@ -16,10 +16,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-
 import org.apache.log4j.Logger;
-
-
 
 public class BPConsultant extends Player {
 
@@ -68,9 +65,10 @@ public class BPConsultant extends Player {
 	private double avgSpeed = 0.5;
 
 
+
 	private Tracker ourTracker;
 
-	private int myID;;
+	private int myID;
 	
 	@Override
 	public String getName() {
@@ -165,7 +163,8 @@ public class BPConsultant extends Player {
 			
 			if(curTracking)
 			{
-				//logger.debug("Diver " + " is following " + toTrack.getName());
+				logger.debug("Diver " + " is following " + toTrack.getName());
+				logger.debug("");
 				
 				//update trackLocal
 				boolean change = false;
@@ -185,7 +184,7 @@ public class BPConsultant extends Player {
 					snorkMessage = MessageTranslator.getMessage(ob.o.getName());
 					if(MessageTranslator.hm.get(snorkMessage).getSpeed() == 0)
 					{
-						//logger.debug("tracker sees: " +snorkMessage);
+						logger.debug("tracker sees: " +snorkMessage);
 						return snorkMessage;
 					}
 				}
@@ -208,7 +207,11 @@ public class BPConsultant extends Player {
 						&& taskManager.seenCreatures.get(ob.o.getName()).size() <= 2 
 						&& !taskManager.chasedCreatures.containsKey(ob.o.getName()))
 				{
+<<<<<<< .mine
+					logger.debug("tracking: " +snorkMessage);
+=======
 					logger.debug(myID +" tracking: " +snorkMessage);
+>>>>>>> .r65
 					curTracking = true;
 					pmt = new PlayerMovementTracker(myPosition, playerLocations);
 					toTrack = MessageTranslator.hm.get(snorkMessage);
@@ -237,10 +240,22 @@ public class BPConsultant extends Player {
 		
 		return 0;
 	}
+	
+//	private void preprocessDanger(){
+//		if (mapDanger.equals("Extreme danger")){
+//			logger.debug("Detected really dangerous map.");
+//			
+//			//put code here to keep players really close to the board 
+//			//on this dangerous board
+//		}
+//	}
 
 	
 	@Override
 	public Direction getMove() {	
+		
+		logger.debug("Printing task list");
+		taskManager.printTaskList();
 		
 		// handle dangerous maps like Piranha
 		if (SpecialCaseAnalyzer.HIGH_DANGER_STRING.equals(specialCase)) {
@@ -277,7 +292,7 @@ public class BPConsultant extends Player {
 				//if tracking track
 				if(curTracking)
 				{
-					//logger.debug(myPosition + " " + trackLocal);
+					logger.debug(myPosition + " " + trackLocal);
 					Direction dt =  Tracker.track(myPosition, trackLocal);
 					//logger.debug("isTracker and Currently tracking.");
 					return dangerFinder.findSafestDirection(myPosition, myPreviousPosition, whatYouSee, dt, false);
@@ -321,7 +336,7 @@ public class BPConsultant extends Player {
 				//else rando walk
 				if(radiateOut != null)
 				{
-					//logger.debug("Doing rando walk");
+					logger.debug("Doing rando walk");
 					if(Math.abs(myPosition.getX())+r >= Math.abs(d/2) || Math.abs(myPosition.getY())+r >= Math.abs(d/2))
 						radiateOut = null;
 					//logger.debug("seeker radiating out");
@@ -408,6 +423,10 @@ public class BPConsultant extends Player {
 		taskManager = new TaskManager(seaLifePossibilities, ourBoard);
 		MessageTranslator.initializeMap(seaLifePossibilities);
 		this.ourTracker = new Tracker(d,r);
+		this.specialCaseAnalyzer = new SpecialCaseAnalyzer();
+		
+		//mapDanger = specialCaseAnalyzer.detectDangerousMap(seaLifePossibilities);
+		//preprocessDanger();
 		
 		this.specialCaseAnalyzer = new SpecialCaseAnalyzer();
 		this.specialCase = specialCaseAnalyzer.detectDangerousMap(seaLifePossibilities);
