@@ -82,7 +82,10 @@ public class TaskManager {
 	/*To add tasks with static creature and fixed position associated*/
 	public void addTask(String creatureName, Point2D coordinate){
 		if ((seenCreatures.get(creatureName)).size() > 0 || numTasks(creatureName) > 1)
+		{
+			logger.debug("num creatures with name " + creatureName + " seen: " + seenCreatures.get(creatureName).size());
 			return;
+		}
 		
 		Task task = new Task(creatureName, coordinate, ourBoard, seaLifePossibilities, playerLocations);
 		//task.getObservation().setLocation(coordinate);

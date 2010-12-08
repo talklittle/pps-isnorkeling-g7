@@ -20,7 +20,7 @@ public class DangerFinder {
 	static final double DANGER_MULTIPLIER = 2.0;
 	static final double DANGER_MAX_DISTANCE = 6.0;
 	static final double WALL_MAX_DISTANCE = 5.0 / Math.sqrt(2.0) - 1.0;  // let you see corner
-	static final double STATIONARY_DANGER_DISTANCE = 1.5;
+	static final double STATIONARY_DANGER_DISTANCE = 2;
 	
 	private HashMap<Direction, Double> directionDanger;
 	private Point2D myPosition;
@@ -153,14 +153,14 @@ public class DangerFinder {
 	}
 	
 	public void printSurroundingDanger(){
-		//logger.debug("Here's the danger surrounding the diver at " + myPosition + ":");
+		logger.debug("Here's the danger surrounding the diver at " + myPosition + ":");
 		
-		//for (Direction d : directionDanger.keySet()){
-		//	if (d!= null)
-			//	logger.debug(d.toString() + ": " + directionDanger.get(d));
-		//}
+		for (Direction d : directionDanger.keySet()){
+			if (d!= null)
+				logger.debug(d.toString() + ": " + directionDanger.get(d));
+		}
 		
-		//logger.debug("I want to head in direction " + mySafestDirection + ":");
+		logger.debug("I want to head in direction " + mySafestDirection + ":");
 
 	}
 	
@@ -306,8 +306,9 @@ public class DangerFinder {
 	}
 	
 	public Double getDangerInDirection(Direction direction) {
-		if (directionDanger.containsKey(direction))
+		if (directionDanger.containsKey(direction)){
 			return directionDanger.get(direction);
+		}
 		else
 			return 0.0;
 	}
