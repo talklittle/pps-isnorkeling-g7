@@ -63,6 +63,8 @@ public class BPConsultant extends Player {
 	// keep track of maxDistance and timeToMaxDistance to estimate time to return to boat
 	private double maxDistance = 0.0;
 	private int timeToMaxDistance = 1;
+	private Point2D previousMaxDistanceLocation = new Point2D.Double(0,0);
+	private double avgSpeed = 0.5;
 
 	private Tracker ourTracker;;
 	
@@ -97,9 +99,21 @@ public class BPConsultant extends Player {
 		whereIAm = myPosition;
 		round++;
 
+		// FIXME they are going back too early. avgSpeed calculation is reporting too-low average speed
 		if (whereIAm.distance(0, 0) > maxDistance) {
+			int roundDelta = round - timeToMaxDistance;
+//			double locationDelta = whereIAm.distance(previousMaxDistanceLocation);
+			double locationDelta = whereIAm.distance(0,0);
+			double newAvgSpeed = locationDelta / (double)roundDelta;
 			maxDistance = whereIAm.distance(0, 0);
 			timeToMaxDistance = round;
+//			previousMaxDistanceLocation = whereIAm;
+			
+			// keep track of slowest avg speed. conservative measurement to get back on time.
+			if (newAvgSpeed < avgSpeed && newAvgSpeed > 0) {
+				logger.debug("newAvgSpeed="+newAvgSpeed + ", old avgSpeed="+avgSpeed);
+				avgSpeed = newAvgSpeed;
+			}
 		}
 
 		if(isTracker)
@@ -216,12 +230,11 @@ public class BPConsultant extends Player {
 		
 		
 		// Head back to boat if we are running low on time, based on calculated avg speed
-		double avgSpeed = maxDistance / (double) timeToMaxDistance;
-		if (avgSpeed == 0)
-			avgSpeed = 0.3;
 		if (shouldReturnToBoat || (getRemainingTime() <= 6 + (whereIAm.distance(0,0) / avgSpeed))) {
-			shouldReturnToBoat = true;
-			//logger.debug("Returning to the boat.");
+			if (!shouldReturnToBoat) {
+				shouldReturnToBoat = true;
+				logger.debug("Returning to the boat. round="+round);
+			}
 			// If not enough time, ignore all dangerous creatures and return to boat.
 			if (getRemainingTime() < NavigateToBoat.getTimeToBoat(whereIAm) + 6) {
 				direction = NavigateToBoat.getShortestDirectionToBoat(whereIAm);
