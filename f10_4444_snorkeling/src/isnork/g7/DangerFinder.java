@@ -19,7 +19,7 @@ public class DangerFinder {
 	
 	static final double DANGER_MULTIPLIER = 2.0;
 	static final double DANGER_MAX_DISTANCE = 6.0;
-	static final double WALL_MAX_DISTANCE = 5.0 / Math.sqrt(2.0);  // let you see corner
+	static final double WALL_MAX_DISTANCE = 5.0 / Math.sqrt(2.0) - 1.0;  // let you see corner
 	static final double STATIONARY_DANGER_DISTANCE = 1.5;
 	
 	private HashMap<Direction, Double> directionDanger;
@@ -194,7 +194,7 @@ public class DangerFinder {
 					myPosition.getX() + d.getDx(),
 					myPosition.getY() + d.getDy());
 			// Do not consider directions that take us too close to the walls
-			if (ourBoard.isNearBoundary(nextPosition, Math.max(WALL_MAX_DISTANCE, (double)r / Math.sqrt(2.0)))) {
+			if (ourBoard.isNearBoundary(nextPosition, Math.max(WALL_MAX_DISTANCE, (double)r / Math.sqrt(2.0) - 1.0))) {
 				continue;
 			}
 			
