@@ -230,7 +230,6 @@ public class BPConsultant extends Player {
 						&& taskManager.seenCreatures.get(ob.o.getName()).size() <= 2 
 						&& !taskManager.chasedCreatures.containsKey(ob.o.getName()))
 				{
-
 					logger.debug(myID +" tracking: " +snorkMessage);
 					curTracking = true;
 					pmt = new PlayerMovementTracker(myPosition, playerLocations);
@@ -284,7 +283,7 @@ public class BPConsultant extends Player {
 		
 		
 		// Head back to boat if we are running low on time, based on calculated avg speed
-		if (shouldReturnToBoat || (getRemainingTime() <= 6 + (whereIAm.distance(0,0) / avgSpeed))) {
+		if (shouldReturnToBoat || (getRemainingTime() <= 20 + (whereIAm.distance(0,0) / avgSpeed))) {
 			if (!shouldReturnToBoat) {
 				shouldReturnToBoat = true;
 				//logger.debug("Returning to the boat. round="+round);
