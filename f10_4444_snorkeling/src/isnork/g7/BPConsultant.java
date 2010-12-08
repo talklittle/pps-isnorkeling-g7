@@ -130,17 +130,21 @@ public class BPConsultant extends Player {
 		//{
 			//look at all creatures
 			//if tracking, return highest static creature
-			if(pmt!= null){
+			/*if(pmt!= null){
 				if(!pmt.continueChase())
 				{
 					logger.error("Stopping chase");
 					curTracking = false;
+					//return MessageTranslator.getMessage(toTrack.getName());
 				}
-			}
+			}*/
 			
 			if(task != null){
 				if(task.doISeeTheTarget(whatYouSee))
-					task =null;
+				{
+					taskManager.markTaskComplete(task);
+					task = null;
+				}
 			}
 			
 			//read messages
@@ -186,10 +190,10 @@ public class BPConsultant extends Player {
 				boolean change = false;
 				for(OurObservation ob : o)
 				{
-					if(ob.getName() == toTrack.getName())
+					if(ob.o.getName().equals(toTrack.getName()))
 					{
 						change = true;
-						trackLocal = ob.getLocation();
+						trackLocal = ob.o.getLocation();
 					}
 				}
 				if(!change){

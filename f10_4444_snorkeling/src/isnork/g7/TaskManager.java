@@ -58,7 +58,7 @@ public class TaskManager {
 	
 	/*To add tasks with a player associated (a player traveling a moving creature)*/
 	public void addTask(String creatureName, int playerID){
-		if ((seenCreatures.get(creatureName)).size() > 2)
+		if ((seenCreatures.get(creatureName)).size() > 0 || numTasks(creatureName) > 1)
 			return;
 		
 		Task task = new Task(creatureName, playerID, ourBoard, seaLifePossibilities, playerLocations);
@@ -68,9 +68,20 @@ public class TaskManager {
 		seenObjects.put(task, false);
 	}
 	
+	public int numTasks(String s)
+	{
+		int count = 0;
+		for(Task t: taskList)
+		{
+			if(t.toString().equalsIgnoreCase(s))
+				count++;
+		}
+		return count;
+	}
+	
 	/*To add tasks with static creature and fixed position associated*/
 	public void addTask(String creatureName, Point2D coordinate){
-		if ((seenCreatures.get(creatureName)).size() > 2)
+		if ((seenCreatures.get(creatureName)).size() > 0 || numTasks(creatureName) > 1)
 			return;
 		
 		Task task = new Task(creatureName, coordinate, ourBoard, seaLifePossibilities, playerLocations);
@@ -195,6 +206,11 @@ public class TaskManager {
 		while(it.hasNext())
 		{
 			Task t = it.next();
+			//logger.debug("CLEANING TASK");
+			//logger.debug(t.getObservation().getTheLocation().getPlayerID());
+			//logger.debug(sender);
+			//logger.debug(name);
+			//logger.debug(t.toString());
 			if(t.toString().equalsIgnoreCase(name) && sender == t.getObservation().getTheLocation().getPlayerID())
 				it.remove();
 		}
