@@ -58,13 +58,21 @@ public class TaskManager {
 	
 	/*To add tasks with a player associated (a player traveling a moving creature)*/
 	public void addTask(String creatureName, int playerID){
+		if ((seenCreatures.get(creatureName)).size() > 2)
+			return;
+		
 		Task task = new Task(creatureName, playerID, ourBoard, seaLifePossibilities, playerLocations);
+
+		chasedCreatures.put(creatureName,1);
 		taskList.add(task);
 		seenObjects.put(task, false);
 	}
 	
 	/*To add tasks with static creature and fixed position associated*/
 	public void addTask(String creatureName, Point2D coordinate){
+		if ((seenCreatures.get(creatureName)).size() > 2)
+			return;
+		
 		Task task = new Task(creatureName, coordinate, ourBoard, seaLifePossibilities, playerLocations);
 		//task.getObservation().setLocation(coordinate);
 		chasedCreatures.put(creatureName,1);
