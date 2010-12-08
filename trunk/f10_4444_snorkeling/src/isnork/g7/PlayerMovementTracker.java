@@ -12,6 +12,7 @@ public class PlayerMovementTracker {
 	
 	private Point2D myOriginialPosition;
 	private LinkedList<pLocation> locations;
+	private int round;
 	public PlayerMovementTracker(Point2D myPosition, Set<Observation> pLocations)
 	{
 		locations = new LinkedList<pLocation>();
@@ -20,10 +21,12 @@ public class PlayerMovementTracker {
 		{
 			locations.add(new pLocation(o.getId(),o.getLocation().distance(myPosition)));
 		}
+		round = 0;
 	}
 	
-	public void update(Point2D myPosition, Set<Observation> pLocations, int round)
+	public void update(Point2D myPosition, Set<Observation> pLocations)
 	{
+		++round;
 		if(round%15!=0)
 			return;
 		

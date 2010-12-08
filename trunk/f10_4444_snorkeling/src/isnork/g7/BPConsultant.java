@@ -57,6 +57,7 @@ public class BPConsultant extends Player {
 	private Task task = null;
 	private Direction radiateOut = null;
 	private Set<Observation> pLocations = null;
+	private PlayerMovementTracker pmt= null;
 	private SpecialCaseAnalyzer specialCaseAnalyzer = null;  // detect Piranha etc. maps
 	private String specialCase = "";
 	
@@ -65,6 +66,7 @@ public class BPConsultant extends Player {
 	private int timeToMaxDistance = 1;
 	private Point2D previousMaxDistanceLocation = new Point2D.Double(0,0);
 	private double avgSpeed = 0.5;
+
 
 	private Tracker ourTracker;;
 	
@@ -82,6 +84,8 @@ public class BPConsultant extends Player {
 		taskManager.updatePlayerLocations(playerLocations);
 		pLocations = playerLocations;
 		ourTracker.updatePoints(playerLocations, myPosition);
+		if(pmt!=null)
+			pmt.update(myPosition, playerLocations);
 		
 		Observation[] a = new Observation[whatYouSee.size()];
 		ArrayList<OurObservation> o = new ArrayList<OurObservation>();
@@ -120,6 +124,12 @@ public class BPConsultant extends Player {
 		{
 			//look at all creatures
 			//if tracking, return highest static creature
+			if(pmt!= null){
+				if(!pmt.continueChase())
+					curTracking = false;
+			}
+			
+			
 			if(curTracking)
 			{
 				//logger.debug("Diver " + " is following " + toTrack.getName());
@@ -154,11 +164,12 @@ public class BPConsultant extends Player {
 			{
 				snorkMessage = MessageTranslator.getMessage(ob.o.getName());
 				if(MessageTranslator.hm.get(snorkMessage).getSpeed() > 0 
-						|| !taskManager.seenCreatures.containsKey(ob.o.getName()) 
-						|| !taskManager.chasedCreatures.containsKey(ob.o.getName()))
+						&& taskManager.seenCreatures.get(ob.o.getName()).size() <= 2 
+						&& !taskManager.chasedCreatures.containsKey(ob.o.getName()))
 				{
 				//	logger.debug("tracking: " +snorkMessage);
 					curTracking = true;
+					pmt = new PlayerMovementTracker(myPosition, playerLocations);
 					toTrack = MessageTranslator.hm.get(snorkMessage);
 					trackLocal = ob.o.getLocation();
 					return snorkMessage;
@@ -260,6 +271,7 @@ public class BPConsultant extends Player {
 				{
 					//logger.debug(myPosition + " " + trackLocal);
 					Direction dt =  Tracker.track(myPosition, trackLocal);
+					logger.debug("isTracker and Currently tracking.");
 					return dangerFinder.findSafestDirection(myPosition, myPreviousPosition, whatYouSee, dt, false);
 				}
 				//else rando-walk
@@ -269,11 +281,13 @@ public class BPConsultant extends Player {
 				{
 					if(Math.abs(myPosition.getX())+r >= Math.abs(d/2) || Math.abs(myPosition.getY())+r >= Math.abs(d/2))
 						radiateOut = null;
+					logger.debug("is tracker but not tracking, should radiate out.");
 					return dangerFinder.findSafestDirection(myPosition, myPreviousPosition, whatYouSee, radiateOut, false);
 				}
 				else
 				{
 					Direction dest = ourTracker.getClosestUnexplored(myPosition);
+					logger.debug("non tracking tracker after radiate out.");
 					return dangerFinder.findSafestDirection(myPosition, myPreviousPosition, whatYouSee, dest, false);
 				}
 			}
@@ -296,6 +310,7 @@ public class BPConsultant extends Player {
 						else
 						{
 							direction = Tracker.track(myPosition, task.getObservation().getTheLocation().getLocation());
+							logger.debug("Chasing a task");
 							return dangerFinder.findSafestDirection(myPosition, myPreviousPosition, whatYouSee, direction, false);
 						}
 					}
@@ -306,11 +321,13 @@ public class BPConsultant extends Player {
 					//logger.debug("Doing rando walk");
 					if(Math.abs(myPosition.getX())+r >= Math.abs(d/2) || Math.abs(myPosition.getY())+r >= Math.abs(d/2))
 						radiateOut = null;
+					logger.debug("seeker radiating out");
 					return dangerFinder.findSafestDirection(myPosition, myPreviousPosition, whatYouSee, radiateOut, false);
 				}
 				else
 				{
 					Direction dest = ourTracker.getClosestUnexplored(myPosition);
+					logger.debug("seeker random walk");
 					return dangerFinder.findSafestDirection(myPosition, myPreviousPosition, whatYouSee, dest, false);
 				}
 				

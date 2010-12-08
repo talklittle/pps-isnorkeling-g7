@@ -82,7 +82,11 @@ public class Tracker {
 		if(best == null)
 			return null;
 		else
-			return OurBoard.getDirectionTowards(myPosition, best);
+		{
+			Direction d =  OurBoard.getDirectionTowards(myPosition, best);
+			logger.debug(d);
+			return d;
+		}
 	}
 	
 	public static Direction track(Point2D me, Point2D beast)
