@@ -60,5 +60,9 @@ public class Location {
 		
 		return null;
 	}
+	
+	public int getPlayerID(){
+		return playerID;
+	}
 
 }
