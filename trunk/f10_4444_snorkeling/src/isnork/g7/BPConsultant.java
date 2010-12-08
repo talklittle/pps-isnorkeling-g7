@@ -68,7 +68,9 @@ public class BPConsultant extends Player {
 	private double avgSpeed = 0.5;
 
 
-	private Tracker ourTracker;;
+	private Tracker ourTracker;
+
+	private int myID;;
 	
 	@Override
 	public String getName() {
@@ -87,12 +89,15 @@ public class BPConsultant extends Player {
 		if(pmt!=null)
 			pmt.update(myPosition, playerLocations);
 		
+		if(round == 10)
+			logger.debug(myID=getMyID(playerLocations, myPosition));
+		
 		Observation[] a = new Observation[whatYouSee.size()];
 		ArrayList<OurObservation> o = new ArrayList<OurObservation>();
 		whatYouSee.toArray(a);
 		for(int i=0; i<a.length;i++)
 		{
-			if(a[i].getId()>1)
+			if(a[i].getId()>=0 && !a[i].getName().equalsIgnoreCase(getName()))
 			{
 				o.add(new OurObservation(a[i]));
 			}
@@ -115,18 +120,46 @@ public class BPConsultant extends Player {
 			
 			// keep track of slowest avg speed. conservative measurement to get back on time.
 			if (newAvgSpeed < avgSpeed && newAvgSpeed > 0) {
-				logger.debug("newAvgSpeed="+newAvgSpeed + ", old avgSpeed="+avgSpeed);
+				//logger.debug("newAvgSpeed="+newAvgSpeed + ", 	old avgSpeed="+avgSpeed);
 				avgSpeed = newAvgSpeed;
 			}
 		}
 
-		if(isTracker)
-		{
+		//if(isTracker)
+		//{
 			//look at all creatures
 			//if tracking, return highest static creature
 			if(pmt!= null){
 				if(!pmt.continueChase())
+				{
+					logger.error("Stopping chase");
 					curTracking = false;
+				}
+			}
+			
+			if(task != null){
+				if(task.doISeeTheTarget(whatYouSee))
+					task =null;
+			}
+			
+			//read messages
+			iSnorkMessage temp = null;
+			String mess = null;
+			SeaLifePrototype obs = null;
+			Iterator<iSnorkMessage> it = incomingMessages.iterator();
+			while(it.hasNext())
+			{
+				temp = it.next();
+				mess= temp.getMsg();
+				obs = MessageTranslator.hm.get(mess);
+				if(obs.getSpeed() == 0)
+				{
+					taskManager.addTask(obs.getName(), temp.getLocation());
+				}
+				else
+				{
+					taskManager.addTask(obs.getName(), temp.getSender());
+				}
 			}
 			
 			
@@ -163,11 +196,19 @@ public class BPConsultant extends Player {
 			for(OurObservation ob: o)
 			{
 				snorkMessage = MessageTranslator.getMessage(ob.o.getName());
+				if(!ob.o.getName().equalsIgnoreCase("sea weed")){
+				//	logger.debug(myID);
+				//	logger.debug(ob.o.getName());
+				//	logger.debug(MessageTranslator.hm.get(snorkMessage).getSpeed());
+				//	logger.debug(taskManager.seenCreatures.get(ob.o.getName()).size());
+				//	logger.debug(!taskManager.chasedCreatures.containsKey(ob.o.getName()));
+				}
+				
 				if(MessageTranslator.hm.get(snorkMessage).getSpeed() > 0 
 						&& taskManager.seenCreatures.get(ob.o.getName()).size() <= 2 
 						&& !taskManager.chasedCreatures.containsKey(ob.o.getName()))
 				{
-				//	logger.debug("tracking: " +snorkMessage);
+					logger.debug(myID +" tracking: " +snorkMessage);
 					curTracking = true;
 					pmt = new PlayerMovementTracker(myPosition, playerLocations);
 					toTrack = MessageTranslator.hm.get(snorkMessage);
@@ -176,57 +217,24 @@ public class BPConsultant extends Player {
 				}
 			}
 			//else return highest static creature
-		}
-		else
-		{
-			//read messages
-			iSnorkMessage temp = null;
-			String mess = null;
-			SeaLifePrototype obs = null;
-			Iterator<iSnorkMessage> it = incomingMessages.iterator();
-			while(it.hasNext())
-			{
-				temp = it.next();
-				mess= temp.getMsg();
-				obs = MessageTranslator.hm.get(mess);
-				if(obs.getSpeed() == 0)
-				{
-					taskManager.addTask(obs.getName(), temp.getLocation());
-				}
-				else
-				{
-					taskManager.addTask(obs.getName(), temp.getSender());
-				}
-			}
+		//}
+		//else
+		//{
+			
 			//add stuff to queue
-		}
+	//	}
 		
 		return snorkMessage;
 	}
 	
-	private int getMyID(Set<Observation> playerPositions){
-		HashMap<Integer, Boolean> notMyPosition = new HashMap<Integer, Boolean>();
-		
-		for (int i = 0; i > -n; i--){
-			notMyPosition.put(new Integer(i), false);
-		}
-		
-		Iterator<Observation> playerPositionsIt = playerPositions.iterator();
-		
-		while(playerPositionsIt.hasNext()){
-			Observation nextPlayer = playerPositionsIt.next();
-			int ID = nextPlayer.getId();
-			notMyPosition.put(ID, true);
-		}
-		
-		playerPositionsIt = playerPositions.iterator();
-		
-		for(int i = 0; i > -n; i--){
-			if (notMyPosition.get(i)==false){
-				return i;	
-			}
-		}
+	private int getMyID(Set<Observation> playerPositions, Point2D mypos){
 	
+		for(Observation o: playerPositions)
+		{
+			if(o.getLocation().distance(mypos)==0)
+				return o.getId();
+		}
+		
 		return 0;
 	}
 
@@ -244,7 +252,7 @@ public class BPConsultant extends Player {
 		if (shouldReturnToBoat || (getRemainingTime() <= 6 + (whereIAm.distance(0,0) / avgSpeed))) {
 			if (!shouldReturnToBoat) {
 				shouldReturnToBoat = true;
-				logger.debug("Returning to the boat. round="+round);
+				//logger.debug("Returning to the boat. round="+round);
 			}
 			// If not enough time, ignore all dangerous creatures and return to boat.
 			if (getRemainingTime() < NavigateToBoat.getTimeToBoat(whereIAm) + 6) {
@@ -264,35 +272,36 @@ public class BPConsultant extends Player {
 		} else {
 			//logger.trace("in getMove()");
 			
-			if(isTracker)
-			{
+			//if(isTracker)
+			//{
 				//if tracking track
 				if(curTracking)
 				{
 					//logger.debug(myPosition + " " + trackLocal);
 					Direction dt =  Tracker.track(myPosition, trackLocal);
-					logger.debug("isTracker and Currently tracking.");
+					//logger.debug("isTracker and Currently tracking.");
 					return dangerFinder.findSafestDirection(myPosition, myPreviousPosition, whatYouSee, dt, false);
 				}
 				//else rando-walk
 				//return Tracker.track(null, myPosition, beast);
-				
+			/*	
 				if(radiateOut != null)
 				{
 					if(Math.abs(myPosition.getX())+r >= Math.abs(d/2) || Math.abs(myPosition.getY())+r >= Math.abs(d/2))
 						radiateOut = null;
-					logger.debug("is tracker but not tracking, should radiate out.");
+					//logger.debug("is tracker but not tracking, should radiate out.");
 					return dangerFinder.findSafestDirection(myPosition, myPreviousPosition, whatYouSee, radiateOut, false);
 				}
 				else
 				{
 					Direction dest = ourTracker.getClosestUnexplored(myPosition);
-					logger.debug("non tracking tracker after radiate out.");
+					//logger.debug("non tracking tracker after radiate out.");
 					return dangerFinder.findSafestDirection(myPosition, myPreviousPosition, whatYouSee, dest, false);
 				}
-			}
-			else
-			{
+				*/
+		//	}
+		//	else
+		//	{
 				//if on task, go
 				if(task == null)
 				{
@@ -302,18 +311,12 @@ public class BPConsultant extends Player {
 				{
 					/** Elizabeth, please see this code below */
 					Point2D objCoord = task.getObservation().getTheLocation().getLocation();
-					
-					if (objCoord!=null){
-						//if(myPosition.distance(task.getObservation().getTheLocation().getLocation()) < 5)
-						if(task.doISeeTheTarget(whatYouSee))
-							task =null;
-						else
-						{
-							direction = Tracker.track(myPosition, task.getObservation().getTheLocation().getLocation());
-							logger.debug("Chasing a task");
-							return dangerFinder.findSafestDirection(myPosition, myPreviousPosition, whatYouSee, direction, false);
-						}
-					}
+			
+					direction = Tracker.track(myPosition, objCoord);
+					//logger.debug("Chasing a task");
+					return dangerFinder.findSafestDirection(myPosition, myPreviousPosition, whatYouSee, direction, false);
+						
+				
 				}
 				//else rando walk
 				if(radiateOut != null)
@@ -321,17 +324,17 @@ public class BPConsultant extends Player {
 					//logger.debug("Doing rando walk");
 					if(Math.abs(myPosition.getX())+r >= Math.abs(d/2) || Math.abs(myPosition.getY())+r >= Math.abs(d/2))
 						radiateOut = null;
-					logger.debug("seeker radiating out");
+					//logger.debug("seeker radiating out");
 					return dangerFinder.findSafestDirection(myPosition, myPreviousPosition, whatYouSee, radiateOut, false);
 				}
 				else
 				{
 					Direction dest = ourTracker.getClosestUnexplored(myPosition);
-					logger.debug("seeker random walk");
+					//logger.debug("seeker random walk");
 					return dangerFinder.findSafestDirection(myPosition, myPreviousPosition, whatYouSee, dest, false);
 				}
 				
-			}
+		//	}
 			/*
 			Direction d = dangerFinder.findSafestDirection(myPosition, myPreviousPosition,
 					whatYouSee, direction, false);
