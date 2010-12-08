@@ -84,6 +84,9 @@ public class BPConsultant extends Player {
 		taskManager.updatePlayerLocations(playerLocations);
 		pLocations = playerLocations;
 		ourTracker.updatePoints(playerLocations, myPosition);
+		
+		taskManager.updateSeenCreatures(whatYouSee);
+		
 		if(pmt!=null)
 			pmt.update(myPosition, playerLocations);
 		
@@ -146,10 +149,23 @@ public class BPConsultant extends Player {
 			SeaLifePrototype obs = null;
 			Iterator<iSnorkMessage> it = incomingMessages.iterator();
 			while(it.hasNext())
-			{
+			{	
 				temp = it.next();
 				mess= temp.getMsg();
 				obs = MessageTranslator.hm.get(mess);
+				
+			/*
+				if(task != null){
+					if(obs.getName().equalsIgnoreCase(task.toString()))
+					{
+						taskManager.markTaskComplete(task);
+						task = null;
+					}
+				}
+				*/
+				taskManager.cleanTasks(obs.getName(), temp.getSender());
+				
+				
 				if(obs.getSpeed() == 0)
 				{
 					taskManager.addTask(obs.getName(), temp.getLocation());
@@ -176,8 +192,11 @@ public class BPConsultant extends Player {
 						trackLocal = ob.getLocation();
 					}
 				}
-				if(!change)
+				if(!change){
 					curTracking=false;
+					logger.debug("STOPPPPPPPPPPPPPPPPP");
+					return MessageTranslator.getMessage(toTrack.getName());
+				}
 				
 				for(OurObservation ob: o)
 				{
@@ -207,11 +226,8 @@ public class BPConsultant extends Player {
 						&& taskManager.seenCreatures.get(ob.o.getName()).size() <= 2 
 						&& !taskManager.chasedCreatures.containsKey(ob.o.getName()))
 				{
-<<<<<<< .mine
-					logger.debug("tracking: " +snorkMessage);
-=======
+
 					logger.debug(myID +" tracking: " +snorkMessage);
->>>>>>> .r65
 					curTracking = true;
 					pmt = new PlayerMovementTracker(myPosition, playerLocations);
 					toTrack = MessageTranslator.hm.get(snorkMessage);

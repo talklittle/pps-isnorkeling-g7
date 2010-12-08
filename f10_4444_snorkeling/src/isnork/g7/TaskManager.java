@@ -123,6 +123,13 @@ public class TaskManager {
 	public void markTaskComplete(Task task){
 		task.getObservation().setInvalid();
 		markCreatureSeen(task.getObservation().getCreatureName(), task.getObservation().getId());
+		Iterator<Task> it = taskList.iterator();
+		while(it.hasNext())
+		{
+			Task t = it.next();
+			if(t.toString().equalsIgnoreCase(task.toString()))
+				it.remove();
+		}
 	}
 	
 	private void markCreatureSeen(String creatureName, int id){
@@ -151,14 +158,45 @@ public class TaskManager {
 		}
 	}
 	
+	public void updateSeenCreatures(Set<Observation> creatures)
+	{
+		for(Observation o: creatures)
+		{
+			if(!o.getName().equalsIgnoreCase("bp consultant"))
+				seenCreatures.get(o.getName()).add(new Integer(o.getId()));
+		}
+	}
+	
 	public void printTaskList(){
 		Iterator<Task> taskIterator = taskList.iterator();
 		int counter = 0;
 		
 		while(taskIterator.hasNext()){
 			Task nextTask = taskIterator.next();
-			if(nextTask.getObservation().happiness() > 0)
-				logger.debug(counter++ + " " + nextTask);
+			//if(nextTask.getObservation().happiness() > 0)
+			logger.debug(counter++ + " " + nextTask);
+		}
+	}
+
+	public void cleanTasks(Task task) 
+	{
+		Iterator<Task> it = taskList.iterator();
+		while(it.hasNext())
+		{
+			Task t = it.next();
+			if(t.toString().equalsIgnoreCase(task.toString()))
+				it.remove();
+		}
+	}
+
+	public void cleanTasks(String name, int sender) 
+	{
+		Iterator<Task> it = taskList.iterator();
+		while(it.hasNext())
+		{
+			Task t = it.next();
+			if(t.toString().equalsIgnoreCase(name) && sender == t.getObservation().getTheLocation().getPlayerID())
+				it.remove();
 		}
 	}
 }
