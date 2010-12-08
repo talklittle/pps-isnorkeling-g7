@@ -2,7 +2,6 @@ package isnork.g7;
 
 import isnork.sim.Observation;
 import isnork.sim.SeaLifePrototype;
-
 import java.awt.geom.Point2D;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -10,6 +9,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Set;
+
+import org.apache.log4j.Logger;
+
 
 /*TODO: STILL NEED TO MARK TASKS INVALID AFTER GETTING MESSAGE FROM FOLLOWING PLAYER THAT STOPS FOLLOWING THE CREATURE*/
 
@@ -24,6 +26,8 @@ public class TaskManager {
 	private Set<SeaLifePrototype> seaLifePossibilities;
 	private Set<Observation> playerLocations;
 	
+	private static final Logger logger = Logger.getLogger(TaskManager.class);
+
 	public TaskManager(Set<SeaLifePrototype> seaLifePossibilities, OurBoard ourBoard){
 		taskList = new PriorityQueue<Task>(10, new TaskComparator());
 		seenObjects = new HashMap<Task, Boolean>();
@@ -129,13 +133,24 @@ public class TaskManager {
 		while (hasNextTask){
 			nextTask = taskIterator.next();
 			nextTask.updatePriorityScore(myCurrentLocation, seenCreatures);
-			hasNextTask = taskIterator.hasNext();
+			hasNextTask = taskIterator.hasNext();	
 		}
 	}
 	
 	public void updatePlayerLocations(Set<Observation> playerLocations){
 		for(Task task : taskList){
 			task.updatePlayerLocations(playerLocations);
+		}
+	}
+	
+	public void printTaskList(){
+		Iterator<Task> taskIterator = taskList.iterator();
+		int counter = 0;
+		
+		while(taskIterator.hasNext()){
+			Task nextTask = taskIterator.next();
+			if(nextTask.getObservation().happiness() > 0)
+				logger.debug(counter++ + " " + nextTask);
 		}
 	}
 }
