@@ -84,7 +84,7 @@ public class Tracker {
 		else
 		{
 			Direction d =  OurBoard.getDirectionTowards(myPosition, best);
-			logger.debug(d);
+			//logger.debug(d);
 			return d;
 		}
 	}
